@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EntityBase : MonoBehaviour
+public class HeroEntityData : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()

@@ -2,17 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IEntity : MonoBehaviour
+namespace AutoChessRPG.Entity
 {
-    // Start is called before the first frame update
-    void Start()
+    public interface IEntity
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public EntityBaseData GetBaseData();
     }
 }

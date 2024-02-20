@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
-namespace AutoChessRPG.Affinity
+namespace AutoChessRPG
 {
     public enum Affinity
     {
