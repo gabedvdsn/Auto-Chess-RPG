@@ -51,7 +51,7 @@ namespace AutoChessRPG
             owner.ApplyModifierToStats(effect.GetModifier(), effect.GetEffectAmount());
         }
         
-        public bool AddEffect(EntityBaseData source, EffectBaseData effect)
+        public bool AddEffect(ICharacterEntity source, EffectBaseData effect)
         {
             shelf[effect] = new EffectRecord(source, owner, effect, Time.time);
             
@@ -60,7 +60,7 @@ namespace AutoChessRPG
             return true;
         }
 
-        public void RemoveEffect(EffectBaseData effect)
+        public bool RemoveEffect(EffectBaseData effect)
         {
             EffectRecord record = shelf[effect];
 
@@ -68,6 +68,8 @@ namespace AutoChessRPG
             shelf.Remove(effect);
 
             if (effect.GetReverseEffectsAtTermination()) owner.ApplyModifierToStats(effect.GetModifier(), -record.statDelta);
+
+            return true;
         }
 
         public void ApplyDispell(Dispell dispell)
@@ -104,8 +106,8 @@ namespace AutoChessRPG
 
     public struct EffectRecord : IObservableData
     {
-        public Character target;
-        public EntityBaseData source;
+        public ICharacterEntity target;
+        public ICharacterEntity source;
         public EffectBaseData baseData;  // the source effect
         
         public float timeInitial;
@@ -115,7 +117,7 @@ namespace AutoChessRPG
 
         public float statDelta;
                                     
-        public EffectRecord(EntityBaseData _source, Character _target, EffectBaseData _baseData, float _timeInitial)
+        public EffectRecord(ICharacterEntity _source, ICharacterEntity _target, EffectBaseData _baseData, float _timeInitial)
         {
             source = _source;
             target = _target;
@@ -149,9 +151,9 @@ namespace AutoChessRPG
         {
             return new Dictionary<string, string>()
             {
-                {ObservableDataFormatting.ACTION_SOURCE_CHARACTER, source.GetEntityName()},
+                {ObservableDataFormatting.ACTION_SOURCE_CHARACTER, source.GetBaseData().GetEntityName()},
                 {ObservableDataFormatting.ACTION_TARGET_CHARACTER, target.GetBaseData().GetEntityName()},
-                {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_SOURCE, baseData.GetEffectName()},
+                {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_SOURCE, baseData.GetEntityName()},
                 {ObservableDataFormatting.ACTION_TIME_INITIAL, timeInitial.ToString()},
                 {ObservableDataFormatting.ACTION_TIME_FINAL, (timeInitial + (baseData.GetEffectDuration() - timeRemaining)).ToString()},
                 {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_MODIFIER, baseData.GetModifier().ToString()}

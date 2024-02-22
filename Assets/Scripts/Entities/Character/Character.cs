@@ -38,23 +38,21 @@ namespace AutoChessRPG.Entity.Character
 
         }
         
-        public CharacterEntityData GetData() => characterData;
+        public CharacterEntityData GetCharacterData() => characterData;
+
+        public EntityBaseData GetBaseData() => characterData;
 
         public Affiliation GetAffiliation() => affiliation;
 
-        public bool AttachEffect(EntityBaseData source, EffectBaseData effect)
-        {
-            return effectShelf.AddEffect(source, effect);
-        }
+        public bool AttachEffect(ICharacterEntity source, EffectBaseData effect) => effectShelf.AddEffect(source, effect);
+
+        public bool RemoveEffect(EffectBaseData effect) => effectShelf.RemoveEffect(effect);
 
         public bool ApplyModifierToStats(CharacterModifierTag modifier, float amount)
         {
             return stats.ApplyModifier(modifier, amount);
         }
 
-        public EntityBaseData GetBaseData()
-        {
-            return GetData();
-        }
+        
     }
 }

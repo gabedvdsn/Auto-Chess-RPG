@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AutoChessRPG
 {
-    public enum ItemEntity
+    public enum ItemType
     {
         Weapon,
         Support,

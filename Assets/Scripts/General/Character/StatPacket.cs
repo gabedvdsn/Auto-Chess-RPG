@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace AutoChessRPG
 {
+    [Serializable]
     public class StatPacket
     {
         public float maxHealth;

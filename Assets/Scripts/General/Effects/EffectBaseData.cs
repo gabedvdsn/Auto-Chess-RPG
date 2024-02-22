@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AutoChessRPG.Entity;
 using AutoChessRPG.Entity.Character;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
@@ -9,10 +10,9 @@ using UnityEngine.Serialization;
 namespace AutoChessRPG
 {
     [CreateAssetMenu(menuName = "Scriptable Objects/Effect")]
-    public class EffectBaseData : ScriptableObject
+    public class EffectBaseData : EntityBaseData
     {
         [Header("Base Effect Information")] 
-        [SerializeField] private string effectName;
         [SerializeField] private float effectDuration;
         [SerializeField] private Dispell dispellRequirement;
         [SerializeField] private bool reverseEffectsAtTermination;
@@ -25,7 +25,6 @@ namespace AutoChessRPG
 
         public bool GetApplyOnce() => applyOnce;
         
-        public string GetEffectName() => effectName;
         public float GetEffectDuration() => effectDuration;
         
         public Dispell GetDispellRequirement() => dispellRequirement;
