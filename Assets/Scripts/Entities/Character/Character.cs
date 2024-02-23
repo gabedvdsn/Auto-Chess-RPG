@@ -8,7 +8,7 @@ namespace AutoChessRPG.Entity.Character
     public class Character : ObservableSubject, ICharacterEntity
     {
         // Base Information
-        private CharacterEntityData characterData;
+        [SerializeField] private CharacterEntityData characterData;
 
         private Affiliation affiliation;
 
@@ -37,6 +37,8 @@ namespace AutoChessRPG.Entity.Character
         {
 
         }
+
+        public StatPacket getCharacterStatPacket() => stats;
         
         public CharacterEntityData GetCharacterData() => characterData;
 
