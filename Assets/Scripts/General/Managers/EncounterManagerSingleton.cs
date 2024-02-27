@@ -8,10 +8,10 @@ namespace AutoChessRPG
     {
         public static EncounterManagerSingleton Instance;
         
-        private Dictionary<Affiliation, List<CharacterEntityController>> controllersInEncounter;
+        private Dictionary<Affiliation, List<EncounterAutoCharacterController>> controllersInEncounter;
         private EncounterRecordPacket record;
 
-        public void Initialize(Dictionary<Affiliation, List<CharacterEntityController>> _controllersInEncounter)
+        public void Initialize(Dictionary<Affiliation, List<EncounterAutoCharacterController>> _controllersInEncounter)
         {
             controllersInEncounter = _controllersInEncounter;
             record = new EncounterRecordPacket(controllersInEncounter);
@@ -33,23 +33,39 @@ namespace AutoChessRPG
 
         #region Move
 
-        public Vector3 PerformMoveAction(CharacterEntityController self, CharacterControlAction nextAction, CharacterEntityController currTarget = null)
+        /*
+         * Move
+         * Given some offset, find a position towards some currTarget until
+         * Requires currTarget: True (can be null)
+         * Requires nextAction: False
+         * Requires offset: True
+         */
+        
+        public Vector3 PerformMoveAction(EncounterAutoCharacterController self, CharacterControlAction nextAction, float offset, EncounterAutoCharacterController currTarget = null)
         {
-            
+            return Vector3.zero;
         }
         
         #endregion
 
         #region ReTarget
+        
+        /*
+         * ReTarget
+         * Find some new target character that is not the current target, unless the current target is the only possible target
+         * Requires currTarget: True (can be null)
+         * Requires nextAction: False
+         */
+        
         private const ReTargetMethod DEFAULT_FALLBACK_RETARGET_METHOD = ReTargetMethod.Closest;
 
-        private void AddToReTargetRecord(ReTargetMethod targetMethod, CharacterEntityController self, CharacterEntityController currTarget, CharacterEntityController newTarget,
+        private void AddToReTargetRecord(ReTargetMethod targetMethod, EncounterAutoCharacterController self, EncounterAutoCharacterController currTarget, EncounterAutoCharacterController newTarget,
             float reTargetAmount)
         {
             record.reTargetRecord[Time.time] = new ReTargetRecordPacket(targetMethod, self, currTarget, newTarget, reTargetAmount);
         }
         
-        public CharacterEntityController PerformReTargetAction(CharacterEntityController self, CharacterEntityController currTarget,
+        public EncounterAutoCharacterController PerformReTargetAction(EncounterAutoCharacterController self, EncounterAutoCharacterController currTarget,
             ReTargetMethod targetMethod, ReTargetMethod secondaryTargetMethod = ReTargetMethod.Closest, bool secondarySearch = false)
         {
             var targetAffiliation = AffiliationManager.GetOpposingAffiliation(self.GetCharacter().GetAffiliation());
@@ -60,21 +76,22 @@ namespace AutoChessRPG
             return result.Item1;
         }
 
-        private (CharacterEntityController, float) ReTarget(CharacterEntityController self, Affiliation targetAffiliation, CharacterEntityController currTarget = null,
-            ReTargetMethod targetMethod = ReTargetMethod.Closest, ReTargetMethod secondaryTargetMethod = ReTargetMethod.Closest, List<CharacterEntityController> toCheck = null)
+        private (EncounterAutoCharacterController, float) ReTarget(EncounterAutoCharacterController self, Affiliation targetAffiliation, EncounterAutoCharacterController currTarget = null,
+            ReTargetMethod targetMethod = ReTargetMethod.Closest, ReTargetMethod secondaryTargetMethod = ReTargetMethod.Closest, List<EncounterAutoCharacterController> toCheck = null)
         {
             return targetMethod switch
             {
                 ReTargetMethod.Closest => ReTargetClosest(self, targetAffiliation, currTarget, toCheck),
                 ReTargetMethod.MostHealth => ReTargetMostHealth(targetAffiliation, currTarget, toCheck),
                 ReTargetMethod.MostMana => ReTargetMostMana(targetAffiliation, currTarget, toCheck),
+                ReTargetMethod.MostAttack => ReTargetMostAttack(targetAffiliation, currTarget, toCheck),
                 ReTargetMethod.MostDangerous => ReTargetMostDangerous(self, targetAffiliation, secondaryTargetMethod, currTarget, toCheck),
                 _ => (currTarget, 0f)
             };
         }
 
-        private (CharacterEntityController, float) ReTargetClosest(CharacterEntityController self, Affiliation targetAffiliation, CharacterEntityController currTarget = null,
-            List<CharacterEntityController> toCheck = null)
+        private (EncounterAutoCharacterController, float) ReTargetClosest(EncounterAutoCharacterController self, Affiliation targetAffiliation, EncounterAutoCharacterController currTarget = null,
+            List<EncounterAutoCharacterController> toCheck = null)
         {
             var closest = currTarget;
             float closestDistance = currTarget is null ? 0 : Vector3.Distance(self.transform.position, closest.transform.position);
@@ -94,8 +111,8 @@ namespace AutoChessRPG
             return (closest, closestDistance);
         }
 
-        private (CharacterEntityController, float) ReTargetMostHealth(Affiliation targetAffiliation, CharacterEntityController currTarget = null,
-            List<CharacterEntityController> toCheck = null)
+        private (EncounterAutoCharacterController, float) ReTargetMostHealth(Affiliation targetAffiliation, EncounterAutoCharacterController currTarget = null,
+            List<EncounterAutoCharacterController> toCheck = null)
         {
             var healthiest = currTarget;
             float healthiestAmount = currTarget is null ? 0 : currTarget.GetCharacterStatPacket().currHealth;
@@ -115,8 +132,8 @@ namespace AutoChessRPG
             return (healthiest, healthiestAmount);
         }
 
-        private (CharacterEntityController, float) ReTargetMostMana(Affiliation targetAffiliation, CharacterEntityController currTarget = null,
-            List<CharacterEntityController> toCheck = null)
+        private (EncounterAutoCharacterController, float) ReTargetMostMana(Affiliation targetAffiliation, EncounterAutoCharacterController currTarget = null,
+            List<EncounterAutoCharacterController> toCheck = null)
         {
             var manaest = currTarget;
             float manaestAmount = currTarget is null ? 0 : currTarget.GetCharacterStatPacket().currMana;
@@ -135,11 +152,32 @@ namespace AutoChessRPG
 
             return (manaest, manaestAmount);
         }
-
-        private (CharacterEntityController, float) ReTargetMostDangerous(CharacterEntityController self, Affiliation targetAffiliation, ReTargetMethod secondaryTargetMethod,
-            CharacterEntityController currTarget = null, List<CharacterEntityController> toCheck = null)
+        
+        private (EncounterAutoCharacterController, float) ReTargetMostAttack(Affiliation targetAffiliation, EncounterAutoCharacterController currTarget = null,
+            List<EncounterAutoCharacterController> toCheck = null)
         {
-            var possibleControllers = new List<CharacterEntityController>();
+            var attackest = currTarget;
+            float attackAmounht = currTarget is null ? 0 : currTarget.GetCharacterStatPacket().attackDamage;
+
+            foreach (var controller in toCheck ?? controllersInEncounter[targetAffiliation])
+            {
+                if (controller == attackest) continue;
+
+                float health = controller.GetCharacterStatPacket().attackDamage;
+
+                if (!(health < attackAmounht)) continue;
+
+                attackest = controller;
+                attackAmounht = health;
+            }
+
+            return (attackest, attackAmounht);
+        }
+
+        private (EncounterAutoCharacterController, float) ReTargetMostDangerous(EncounterAutoCharacterController self, Affiliation targetAffiliation, ReTargetMethod secondaryTargetMethod,
+            EncounterAutoCharacterController currTarget = null, List<EncounterAutoCharacterController> toCheck = null)
+        {
+            var possibleControllers = new List<EncounterAutoCharacterController>();
 
             foreach (var controller in toCheck ?? controllersInEncounter[targetAffiliation])
             {
@@ -160,11 +198,11 @@ namespace AutoChessRPG
 
     public class EncounterRecordPacket
     {
-        public Dictionary<Affiliation, List<CharacterEntityController>> controllersInEncounter;
+        public Dictionary<Affiliation, List<EncounterAutoCharacterController>> controllersInEncounter;
         public Dictionary<float, MoveRecordPacket> moveRecord;
         public Dictionary<float, ReTargetRecordPacket> reTargetRecord;
 
-        public EncounterRecordPacket(Dictionary<Affiliation, List<CharacterEntityController>> _controllersInEncounter)
+        public EncounterRecordPacket(Dictionary<Affiliation, List<EncounterAutoCharacterController>> _controllersInEncounter)
         {
             controllersInEncounter = _controllersInEncounter;
 
@@ -175,11 +213,11 @@ namespace AutoChessRPG
 
     public struct MoveRecordPacket
     {
-        public CharacterEntityController self;
+        public EncounterAutoCharacterController self;
         public Vector3 initialPosition;
         public Vector3 targetPosition;
 
-        public MoveRecordPacket(CharacterEntityController _self, Vector3 _initialPosition, Vector3 _targetPosition)
+        public MoveRecordPacket(EncounterAutoCharacterController _self, Vector3 _initialPosition, Vector3 _targetPosition)
         {
             self = _self;
             initialPosition = _initialPosition;
@@ -190,12 +228,12 @@ namespace AutoChessRPG
     public struct ReTargetRecordPacket
     {
         public ReTargetMethod reTargetMethod;
-        public CharacterEntityController self;
-        public CharacterEntityController initialTarget;
-        public CharacterEntityController newTarget;
+        public EncounterAutoCharacterController self;
+        public EncounterAutoCharacterController initialTarget;
+        public EncounterAutoCharacterController newTarget;
         public float reTargetAmount;
 
-        public ReTargetRecordPacket(ReTargetMethod _reTargetMethod, CharacterEntityController _self, CharacterEntityController _initialTarget, CharacterEntityController _newTarget,
+        public ReTargetRecordPacket(ReTargetMethod _reTargetMethod, EncounterAutoCharacterController _self, EncounterAutoCharacterController _initialTarget, EncounterAutoCharacterController _newTarget,
             float _reTargetAmount)
         {
             reTargetMethod = _reTargetMethod;

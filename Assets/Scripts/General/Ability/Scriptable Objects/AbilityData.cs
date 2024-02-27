@@ -10,10 +10,14 @@ namespace AutoChessRPG
     public class AbilityData : EntityBaseData
     {
         [Header("Base Ability Information")] 
-        [SerializeField] private Affiliation[] canTarget;
+        [SerializeField] private Affiliation canTarget;
         [SerializeField] private EffectBaseData[] effectsOfAbility;
+        [SerializeField] private AbilityActivation activation;
 
-        public Affiliation[] GetTargetableAffiliations() => canTarget;
+        public Affiliation GetTargetableAffiliation() => canTarget;
+
+        public AbilityActivation GetAbilityActivation() => activation;
+        
         public string GetAbilityName() => GetEntityName();
         
         public EffectBaseData[] GetEffects() => effectsOfAbility;

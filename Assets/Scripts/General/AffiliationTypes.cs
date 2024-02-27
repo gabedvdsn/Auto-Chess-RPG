@@ -4,7 +4,6 @@ namespace AutoChessRPG
     {
         Ally,
         Enemy,
-        Neutral,
         NONE
     }
 
@@ -16,7 +15,6 @@ namespace AutoChessRPG
             {
                 Affiliation.Ally => Affiliation.Enemy,
                 Affiliation.Enemy => Affiliation.Ally,
-                Affiliation.Neutral => Affiliation.NONE,
                 _ => Affiliation.NONE
             };
         }

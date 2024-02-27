@@ -14,12 +14,11 @@ namespace AutoChessRPG.Entity.Character
 
         private EffectShelf effectShelf;
         private AbilityShelf abilityShelf;
+        private ItemShelf itemShelf;
 
         private StatPacket stats;
-        
-        // Status Information
-        private bool isDead;
-        private bool isPermanentlyDead;
+
+        private EncounterPreferencesPacket encounterPreferences;
         
         // Start is called before the first frame update
         void Start()
@@ -38,22 +37,38 @@ namespace AutoChessRPG.Entity.Character
 
         }
 
-        public StatPacket getCharacterStatPacket() => stats;
+        #region Getters
+        
+        public StatPacket GetCharacterStatPacket() => stats;
+
+        public ItemShelf GetCharacterItemShelf() => itemShelf;
+
+        public EncounterPreferencesPacket GetCharacterEncounterPreferencesPacket() => encounterPreferences;
         
         public CharacterEntityData GetCharacterData() => characterData;
 
         public EntityBaseData GetBaseData() => characterData;
 
         public Affiliation GetAffiliation() => affiliation;
+        
+        #endregion
+        
+        #region Effects
 
         public bool AttachEffect(ICharacterEntity source, EffectBaseData effect) => effectShelf.AddEffect(source, effect);
 
         public bool RemoveEffect(EffectBaseData effect) => effectShelf.RemoveEffect(effect);
+        
+        #endregion
+        
+        #region Applications
 
         public bool ApplyModifierToStats(CharacterModifierTag modifier, float amount)
         {
             return stats.ApplyModifier(modifier, amount);
         }
+        
+        #endregion
 
         
     }
