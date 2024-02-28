@@ -11,15 +11,15 @@ namespace AutoChessRPG
         // This data includes items under the following categories: resource, spirit, construction, knowledge
         [Header("Item Data Information")] 
         [SerializeField] private ItemType itemType;
-        [SerializeField] private Rarity itemRarity;
         [SerializeField] private AttributePacket attachedAttributes;
         [SerializeField] private StatPacket attachedStats;
         [SerializeField] private AbilityData[] attachedAbilities;
+        [SerializeField] private PowerPacket power;
 
         public ItemType GetItemType() => itemType;
-        
-        public Rarity GetItemRarity() => itemRarity;
 
+        public PowerPacket GetItemPowerPacket() => power;
+        
         public AttributePacket GetAttachedAttributes() => attachedAttributes;
 
         public StatPacket GetAttachedStats() => attachedStats;

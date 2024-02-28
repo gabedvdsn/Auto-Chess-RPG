@@ -19,6 +19,13 @@ namespace AutoChessRPG
         [SerializeField] private int agility;
         [SerializeField] private int intelligence;
 
+        public AttributePacket(int _strength, int _agility, int _intelligence)
+        {
+            strength = _strength;
+            agility = _agility;
+            intelligence = _intelligence;
+        }
+
         public int Strength() => strength;
         public int Agility() => agility;
         public int Intelligence() => intelligence;

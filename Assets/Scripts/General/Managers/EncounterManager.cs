@@ -45,6 +45,22 @@ namespace AutoChessRPG
         
         #endregion
 
+        #region Calculation
+        
+        public float GetAveragePowerFromCharacters(List<Character> characters)
+        {
+            float power = 0f;
+            
+            foreach (Character character in characters)
+            {
+                
+            }
+
+            return power / characters.Count;
+        }
+        
+        #endregion
+
         #region Move
 
         /*

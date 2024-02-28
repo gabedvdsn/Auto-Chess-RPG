@@ -43,7 +43,7 @@ namespace AutoChessRPG
 
             effectShelf.Initialize(this);
 
-            stats = AttributesManager.ComputeStatPacketFromAttributePacket(characterData.GetAttributes());
+            stats = AttributesParameters.ComputeStatPacketFromAttributePacket(characterData.GetAttributes());
 
             return true;
         }

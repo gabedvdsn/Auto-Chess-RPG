@@ -13,10 +13,13 @@ namespace AutoChessRPG
         [SerializeField] private Affiliation canTarget;
         [SerializeField] private EffectBaseData[] effectsOfAbility;
         [SerializeField] private AbilityActivation activation;
+        [SerializeField] private PowerPacket power;
 
         public Affiliation GetTargetableAffiliation() => canTarget;
 
         public AbilityActivation GetAbilityActivation() => activation;
+
+        public PowerPacket GetAbilityPowerPacket() => power;
         
         public string GetAbilityName() => GetEntityName();
         
