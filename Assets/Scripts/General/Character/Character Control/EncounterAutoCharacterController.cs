@@ -123,7 +123,7 @@ namespace AutoChessRPG
                     currAction = CastItem;
                     break;
                 case CharacterControlAction.ReTarget:
-                    ReTarget(preferences.reTargetMethod);
+                    ReTarget(GetPreferredReTargetMethod());
                     break;
                 case CharacterControlAction.Move:
                     break;
@@ -137,7 +137,7 @@ namespace AutoChessRPG
             // retarget
             if (enemyTarget is null)
             {
-                ReTarget();
+                
             }
             
             //
@@ -145,17 +145,17 @@ namespace AutoChessRPG
 
         private AbilityData CheckForCastAbility()
         {
-            
+            return default;
         }
 
         private ItemData CheckForCastItem()
         {
-            
+            return default;
         }
 
         private bool CheckForAttack()
         {
-            
+            return default;
         }
         
         #endregion
@@ -222,9 +222,9 @@ namespace AutoChessRPG
         
         #region Shelf Management
 
-        private void UseAbility(AbilityData ability, Character)
+        private void UseAbility(AbilityData ability)
         {
-            if (ability.GetAbilityActivation() == )
+            
         }
         
         #endregion
@@ -255,14 +255,13 @@ namespace AutoChessRPG
         {
             if (!canCast) return false;
 
-            character.UseAbility(queuedAbility);
             
             return true;
         }
 
         private bool ReTarget(ReTargetMethod reTargetMethod)
         {
-            enemyTarget = EncounterManagerSingleton.Instance.PerformReTargetAction(this, enemyTarget, GetPreferredReTargetMethod());
+            enemyTarget = EncounterManager.Instance.PerformReTargetAction(this, AffiliationManager.GetOpposingAffiliation(character.GetAffiliation()), enemyTarget, GetPreferredReTargetMethod());
             
             return true;
         }

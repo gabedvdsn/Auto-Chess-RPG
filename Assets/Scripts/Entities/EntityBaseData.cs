@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 // ReSharper disable once CheckNamespace
-namespace AutoChessRPG.Entity
+namespace AutoChessRPG
 {
     [CreateAssetMenu(menuName = "Scriptable Objects/Game Entity Base")]
     public class EntityBaseData : ScriptableObject

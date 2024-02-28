@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace AutoChessRPG
 {
-    public class EncounterManagerSingleton : MonoBehaviour
+    public class EncounterManager : MonoBehaviour
     {
-        public static EncounterManagerSingleton Instance;
+        public static EncounterManager Instance;
         
         private Dictionary<Affiliation, List<EncounterAutoCharacterController>> controllersInEncounter;
         private EncounterRecordPacket record;
@@ -30,6 +30,20 @@ namespace AutoChessRPG
                 Instance = this;
             }
         }
+
+        private void Start()
+        {
+            throw new NotImplementedException();
+        }
+        
+        #region Encounter Initialization
+        
+        public static EncounterPreferencesPacket GetDefaultEncounterPreferencesPacket()
+        {
+            return new EncounterPreferencesPacket();
+        }
+        
+        #endregion
 
         #region Move
 
@@ -65,10 +79,9 @@ namespace AutoChessRPG
             record.reTargetRecord[Time.time] = new ReTargetRecordPacket(targetMethod, self, currTarget, newTarget, reTargetAmount);
         }
         
-        public EncounterAutoCharacterController PerformReTargetAction(EncounterAutoCharacterController self, EncounterAutoCharacterController currTarget,
+        public EncounterAutoCharacterController PerformReTargetAction(EncounterAutoCharacterController self, Affiliation targetAffiliation, EncounterAutoCharacterController currTarget,
             ReTargetMethod targetMethod, ReTargetMethod secondaryTargetMethod = ReTargetMethod.Closest, bool secondarySearch = false)
         {
-            var targetAffiliation = AffiliationManager.GetOpposingAffiliation(self.GetCharacter().GetAffiliation());
             var result = ReTarget(self, targetAffiliation, currTarget, targetMethod, secondaryTargetMethod);
 
             AddToReTargetRecord(targetMethod, self, currTarget, result.Item1, result.Item2);

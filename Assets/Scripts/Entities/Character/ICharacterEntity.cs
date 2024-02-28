@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AutoChessRPG.Entity.Character
+namespace AutoChessRPG
 {
     public interface ICharacterEntity : IEntity
     {

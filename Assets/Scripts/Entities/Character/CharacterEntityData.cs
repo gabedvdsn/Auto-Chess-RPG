@@ -1,16 +1,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AutoChessRPG.Entity;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace AutoChessRPG.Entity.Character
+namespace AutoChessRPG
 {
     [CreateAssetMenu(menuName = "Scriptable Objects/Character Entity/Character Base", fileName = "Character")]
     public class CharacterEntityData : EntityBaseData
     {
         [Header("Character Information")] 
         [SerializeField] private Race characterRace;
-        [SerializeField] private Affinity characterAffinity;
+        [FormerlySerializedAs("characterAffinity")] [SerializeField] private Affinity[] characterAffinities;
         [SerializeField] private AttributePacket characterAttributes;
 
         [Header("Physical Information")] 
@@ -25,7 +27,7 @@ namespace AutoChessRPG.Entity.Character
         
         public Race GetCharacterRace() => characterRace;
 
-        public Affinity GetCharacterAffinity() => characterAffinity;
+        public Affinity[] GetCharacterAffinities() => characterAffinities;
         
         public AttributePacket GetAttributes() => characterAttributes;
 
