@@ -4,6 +4,9 @@ namespace AutoChessRPG
 {
     public class WorldManager : MonoBehaviour
     {
-        public
+        public EncounterDataPacket GetTestEncounterPacket()
+        {
+            return new EncounterDataPacket();
+        }
     }
 }

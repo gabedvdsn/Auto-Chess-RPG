@@ -29,5 +29,18 @@ namespace AutoChessRPG
         public int Strength() => strength;
         public int Agility() => agility;
         public int Intelligence() => intelligence;
+
+        public void AddStrength(int amount) => strength += amount;
+        public void AddAgility(int amount) => agility += amount;
+        public void AddIntelligence(int amount) => intelligence += amount;
+
+        public void MergeOtherAttributePacket(AttributePacket other)
+        {
+            strength += other.Strength();
+            agility += other.Agility();
+            intelligence += other.Intelligence();
+        }
+
+        public int GetAttributeSum() => strength + agility + intelligence;
     }
 }

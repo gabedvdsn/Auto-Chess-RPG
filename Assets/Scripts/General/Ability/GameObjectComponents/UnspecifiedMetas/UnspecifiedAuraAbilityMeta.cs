@@ -7,11 +7,11 @@ namespace AutoChessRPG
     public class UnspecifiedAuraAbilityMeta : MonoBehaviour, IAuraAbilityMeta
     {
         [SerializeField] private ICharacterEntity owner;
-        [SerializeField] private AbilityData data;
+        [SerializeField] private BaseAbilityData data;
         
         public bool OnAttachAura(Character target)
         {
-            foreach (EffectBaseData effect in data.GetEffects()) target.AttachEffect(owner, effect);
+            foreach (BaseEffectData effect in data.GetEffects()) target.AttachEffect(owner, effect);
 
             return true;
         }
@@ -25,7 +25,7 @@ namespace AutoChessRPG
 
         public bool OnCharacterExitAura(Character target)
         {
-            foreach (EffectBaseData effect in data.GetEffects()) target.RemoveEffect(effect);
+            foreach (BaseEffectData effect in data.GetEffects()) target.RemoveEffect(effect);
 
             return true;
         }

@@ -13,15 +13,15 @@ namespace AutoChessRPG
     public class EffectShelf : ObservableSubject
     {
         private Character owner;
-        private Dictionary<EffectBaseData, EffectRecord> shelf;
+        private Dictionary<BaseEffectData, EffectRecord> shelf;
         private List<EffectRecord> records;
 
         private bool doDispell;
-        private List<EffectBaseData> dispellQueue;
+        private List<BaseEffectData> dispellQueue;
 
         private void Start()
         {
-            shelf = new Dictionary<EffectBaseData, EffectRecord>();
+            shelf = new Dictionary<BaseEffectData, EffectRecord>();
         }
 
         private void Update()
@@ -35,46 +35,46 @@ namespace AutoChessRPG
 
         private void TickEffects()
         {
-            foreach (EffectBaseData effect in shelf.Keys.Where(effect => shelf[effect].GetResultOfTick() && !effect.GetApplyOnce()))
+            foreach (BaseEffectData effect in shelf.Keys.Where(effect => shelf[effect].GetResultOfTick() && !effect.GetApplyOnce()))
             {
                 ApplyEffect(effect);
             }
         }
 
-        private void ApplyConstantEffect(EffectBaseData effect)
+        private void ApplyConstantEffect(BaseEffectData baseEffect)
         {
-            if (effect.GetApplyOnce()) ApplyEffect(effect);
+            if (baseEffect.GetApplyOnce()) ApplyEffect(baseEffect);
         }
 
-        private void ApplyEffect(EffectBaseData effect)
+        private void ApplyEffect(BaseEffectData baseEffect)
         {
-            owner.ApplyModifierToStats(effect.GetModifier(), effect.GetEffectAmount());
+            owner.ApplyModifierToStats(baseEffect.GetModifier(), baseEffect.GetEffectAmount());
         }
         
-        public bool AddEffect(ICharacterEntity source, EffectBaseData effect)
+        public bool AddEffect(ICharacterEntity source, BaseEffectData baseEffect)
         {
-            shelf[effect] = new EffectRecord(source, owner, effect, Time.time);
+            shelf[baseEffect] = new EffectRecord(source, owner, baseEffect, Time.time);
             
-            ApplyConstantEffect(effect);
+            ApplyConstantEffect(baseEffect);
 
             return true;
         }
 
-        public bool RemoveEffect(EffectBaseData effect)
+        public bool RemoveEffect(BaseEffectData baseEffect)
         {
-            EffectRecord record = shelf[effect];
+            EffectRecord record = shelf[baseEffect];
 
             records.Add(record);
-            shelf.Remove(effect);
+            shelf.Remove(baseEffect);
 
-            if (effect.GetReverseEffectsAtTermination()) owner.ApplyModifierToStats(effect.GetModifier(), -record.statDelta);
+            if (baseEffect.GetReverseEffectsAtTermination()) owner.ApplyModifierToStats(baseEffect.GetModifier(), -record.statDelta);
 
             return true;
         }
 
         public void ApplyDispell(Dispell dispell)
         {
-            foreach (EffectBaseData effect in shelf.Keys.Where(effect => DispellManager.DispellIsEffective(dispell, effect.GetDispellRequirement())))
+            foreach (BaseEffectData effect in shelf.Keys.Where(effect => DispellManager.DispellIsEffective(dispell, effect.GetDispellRequirement())))
             {
                 dispellQueue.Add(effect);
                 doDispell = true;
@@ -83,7 +83,7 @@ namespace AutoChessRPG
 
         private bool EmptyDispellQueue()
         {
-            foreach (EffectBaseData effect in dispellQueue)
+            foreach (BaseEffectData effect in dispellQueue)
             {
                 RemoveEffect(effect);
             }
@@ -108,7 +108,7 @@ namespace AutoChessRPG
     {
         public ICharacterEntity target;
         public ICharacterEntity source;
-        public EffectBaseData baseData;  // the source effect
+        public BaseEffectData data;  // the source baseEffect
         
         public float timeInitial;
         public float timeRemaining;
@@ -117,15 +117,15 @@ namespace AutoChessRPG
 
         public float statDelta;
                                     
-        public EffectRecord(ICharacterEntity _source, ICharacterEntity _target, EffectBaseData _baseData, float _timeInitial)
+        public EffectRecord(ICharacterEntity _source, ICharacterEntity _target, BaseEffectData data, float _timeInitial)
         {
             source = _source;
             target = _target;
             
-            baseData = _baseData;
+            this.data = data;
             
             timeInitial = _timeInitial;
-            timeRemaining = _baseData.GetEffectDuration();
+            timeRemaining = data.GetDuration();
             
             tickDelta = 0f;
             statDelta = 0f;
@@ -135,9 +135,9 @@ namespace AutoChessRPG
         {
             tickDelta += Time.deltaTime;
 
-            if (!(tickDelta > baseData.GetTickRate())) return false;
+            if (!(tickDelta > data.GetTickRate())) return false;
             
-            tickDelta -= baseData.GetTickRate();
+            tickDelta -= data.GetTickRate();
             return true;
 
         }
@@ -153,10 +153,10 @@ namespace AutoChessRPG
             {
                 {ObservableDataFormatting.ACTION_SOURCE_CHARACTER, source.GetBaseData().GetEntityName()},
                 {ObservableDataFormatting.ACTION_TARGET_CHARACTER, target.GetBaseData().GetEntityName()},
-                {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_SOURCE, baseData.GetEntityName()},
+                {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_SOURCE, data.GetEntityName()},
                 {ObservableDataFormatting.ACTION_TIME_INITIAL, timeInitial.ToString()},
-                {ObservableDataFormatting.ACTION_TIME_FINAL, (timeInitial + (baseData.GetEffectDuration() - timeRemaining)).ToString()},
-                {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_MODIFIER, baseData.GetModifier().ToString()}
+                {ObservableDataFormatting.ACTION_TIME_FINAL, (timeInitial + (data.GetDuration() - timeRemaining)).ToString()},
+                {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_MODIFIER, data.GetModifier().ToString()}
             };
         }
     }

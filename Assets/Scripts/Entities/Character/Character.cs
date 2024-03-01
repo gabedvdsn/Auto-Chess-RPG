@@ -16,7 +16,7 @@ namespace AutoChessRPG
         private ItemShelf itemShelf;
 
         private StatPacket stats;
-        private PowerPacket power;
+        private PowerPacket _power;
 
         private EncounterPreferencesPacket encounterPreferences;
         
@@ -52,7 +52,7 @@ namespace AutoChessRPG
         
         public StatPacket GetCharacterStatPacket() => stats;
 
-        public PowerPacket GetCharacterPowerPacket() => power;
+        public PowerPacket GetCharacterPowerPacket() => _power;
 
         public AbilityShelf GetCharacterAbilityShelf() => abilityShelf;
         
@@ -70,9 +70,9 @@ namespace AutoChessRPG
         
         #region Effects
 
-        public bool AttachEffect(ICharacterEntity source, EffectBaseData effect) => effectShelf.AddEffect(source, effect);
+        public bool AttachEffect(ICharacterEntity source, BaseEffectData baseEffect) => effectShelf.AddEffect(source, baseEffect);
 
-        public bool RemoveEffect(EffectBaseData effect) => effectShelf.RemoveEffect(effect);
+        public bool RemoveEffect(BaseEffectData baseEffect) => effectShelf.RemoveEffect(baseEffect);
         
         #endregion
         

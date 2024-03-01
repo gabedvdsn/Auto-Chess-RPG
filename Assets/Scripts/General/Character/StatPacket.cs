@@ -80,9 +80,21 @@ namespace AutoChessRPG
             return true;
         }
 
-        public void ApplyAttributePacket(AttributePacket attributes)
+        public void MergeOtherStatPacket(StatPacket other)
         {
+            maxHealth += other.maxHealth;
+            maxManaPool += other.maxManaPool;
             
+            attackDamage += other.attackDamage;
+            attackSpeed += other.attackSpeed;
+            moveSpeed += other.moveSpeed;
+            armor += other.armor;
+            physicalResistance += other.physicalResistance;
+            negation += other.negation;
+            magicResistance += other.magicResistance;
+            healthRegen += other.healthRegen;
+            manaRegen += other.manaRegen;
+            debuffResistance += other.debuffResistance;
         }
         
     }

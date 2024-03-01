@@ -6,11 +6,11 @@ namespace AutoChessRPG
     public class UnspecifiedPassiveAbilityMeta : MonoBehaviour, IPassiveAbilityMeta
     {
         [SerializeField] private ICharacterEntity owner;
-        [SerializeField] private AbilityData data;
+        [SerializeField] private BaseAbilityData data;
         
         public bool OnAttachPassive()
         {
-            foreach (EffectBaseData effect in data.GetEffects()) owner.AttachEffect(owner, effect);
+            foreach (BaseEffectData effect in data.GetEffects()) owner.AttachEffect(owner, effect);
 
             return true;
         }
@@ -22,7 +22,7 @@ namespace AutoChessRPG
 
         public bool OnRemovePassive()
         {
-            foreach (EffectBaseData effect in data.GetEffects()) owner.RemoveEffect(effect);
+            foreach (BaseEffectData effect in data.GetEffects()) owner.RemoveEffect(effect);
 
             return true;
         }

@@ -8,8 +8,8 @@ namespace AutoChessRPG
     {
         public CharacterEntityData GetCharacterData();
         
-        public bool AttachEffect(ICharacterEntity source, EffectBaseData effect);
+        public bool AttachEffect(ICharacterEntity source, BaseEffectData baseEffect);
 
-        public bool RemoveEffect(EffectBaseData effect);
+        public bool RemoveEffect(BaseEffectData baseEffect);
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AutoChessRPG.Entity.Character;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace AutoChessRPG
 {
@@ -16,8 +17,7 @@ namespace AutoChessRPG
         private StatPacket stats;
         private EncounterPreferencesPacket preferences;
 
-        private EncounterAutoCharacterController enemyTarget;
-        private EncounterAutoCharacterController allyTarget;
+        private EncounterAutoCharacterController target;
 
         // Status information
         private bool isDead
@@ -46,15 +46,19 @@ namespace AutoChessRPG
         }
         
         // Control information
-        private delegate bool CurrActionDelegate();
-        private CurrActionDelegate currAction;
+        private delegate bool QueuedActionDelegate();
+        private QueuedActionDelegate queuedAction;
+
+        private float queuedActionRange;
 
         private bool nothingToDo;
-        private bool movingToAction;
+        private bool actionOverflow;
+        private bool targetOverflow;
+        
         private bool isTargeted;
 
-        private AbilityData queuedAbility;
-        private ItemData queuedItem;
+        private BaseAbilityData _queuedBaseAbility;
+        private BaseItemData _queuedBaseItem;
         
         // Preferences information
         private ReTargetMethod alwaysReTargetMethod = ReTargetMethod.NONE;
@@ -99,7 +103,7 @@ namespace AutoChessRPG
 
         public CharacterMovement GetCharacterMovement() => movement;
         
-        public EncounterAutoCharacterController GetTarget() => enemyTarget;
+        public EncounterAutoCharacterController GetTarget() => target;
 
         public CharacterEntityData GetCharacterData() => data;
 
@@ -107,53 +111,89 @@ namespace AutoChessRPG
         
         #endregion
         
-        #region Controls Readers
+        #region Behaviour Tree
+
+        private void MainBranch()
+        {
+            if (nothingToDo) return;
+
+            if (target is not null) BranchA();
+            else BranchB();
+        }
+
+        private void BranchA()
+        {
+            if (queuedAction is not null) BranchC();
+            else BranchD();
+        }
+
+        private void BranchB()
+        {
+            if (targetOverflow) nothingToDo = true;
+            else
+            {
+                ReTarget();
+                if (target is null) targetOverflow = true;
+            }
+        }
+
+        private void BranchC()
+        {
+            if (Vector3.Distance(transform.position, target.transform.position) < queuedActionRange) DoAction();
+            else MoveToTarget();
+        }
+
+        private void BranchD()
+        {
+            if (actionOverflow) nothingToDo = true;
+            else
+            {
+                QueueNewAction();
+                if (queuedAction is null) actionOverflow = true;
+            }
+        }
 
         private void ConvertControlActionToAction(CharacterControlAction action)
         {
             switch (action)
             {
                 case CharacterControlAction.Attack:
-                    currAction = Attack;
+                    queuedAction = Attack;
                     break;
                 case CharacterControlAction.CastAbility:
-                    currAction = CastAbility;
+                    queuedAction = CastAbility;
                     break;
                 case CharacterControlAction.CastItem:
-                    currAction = CastItem;
+                    queuedAction = CastItem;
                     break;
                 case CharacterControlAction.ReTarget:
-                    ReTarget(GetPreferredReTargetMethod());
+                    ReTarget();
                     break;
                 case CharacterControlAction.Move:
                     break;
             }
         }
 
-        private void GetNewAction()
+        private void QueueNewAction()
         {
-            // FindNewAction() will find a new action to add to queue
+            // QueueNewAction() will find a new action to queue
             
-            // retarget
-            if (enemyTarget is null)
-            {
-                
-            }
-            
-            //
+            if (target is null) return;
+
+            // 
         }
 
-        private AbilityData CheckForCastAbility()
+        private BaseAbilityData QueueCastAbility()
         {
             return default;
         }
 
-        private ItemData CheckForCastItem()
+        private BaseItemData QueueCastItem()
         {
             return default;
         }
 
-        private bool CheckForAttack()
+        private bool QueueAttack()
         {
             return default;
         }
@@ -222,7 +262,7 @@ namespace AutoChessRPG
         
         #region Shelf Management
 
-        private void UseAbility(AbilityData ability)
+        private void UseAbility(BaseAbilityData baseAbility)
         {
             
         }
@@ -259,9 +299,9 @@ namespace AutoChessRPG
             return true;
         }
 
-        private bool ReTarget(ReTargetMethod reTargetMethod)
+        private bool ReTarget()
         {
-            enemyTarget = EncounterManager.Instance.PerformReTargetAction(this, AffiliationManager.GetOpposingAffiliation(character.GetAffiliation()), enemyTarget, GetPreferredReTargetMethod());
+            target = EncounterManager.Instance.PerformReTargetAction(this, AffiliationManager.GetOpposingAffiliation(character.GetAffiliation()), target, GetPreferredReTargetMethod());
             
             return true;
         }
@@ -278,8 +318,8 @@ namespace AutoChessRPG
     {
         Move,  // vector3
         Attack,  // EncounterAutoCharacterController
-        CastAbility,  // EncounterAutoCharacterController, AbilityData
-        CastItem,  // EncounterAutoCharacterController, ItemData
+        CastAbility,  // EncounterAutoCharacterController, BaseAbilityData
+        CastItem,  // EncounterAutoCharacterController, BaseItemData
         ReTarget  //
     }
 

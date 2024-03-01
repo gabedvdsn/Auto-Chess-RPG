@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AutoChessRPG
@@ -117,9 +119,70 @@ namespace AutoChessRPG
             return Mathf.CeilToInt(attributes);
         }
 
-        public static int ComputeUnspecifiedAttributeSumFromAbilities(AbilityData[] abilities)
+        public static int ComputeUnspecifiedAttributeSumFromModifierValues(Dictionary<CharacterModifierTag, float> modifierAmounts)
         {
-            
+            float impreciseAttributes = 0;
+
+            foreach (CharacterModifierTag modifier in modifierAmounts.Keys)
+            {
+                switch (modifier)
+                {
+
+                    case CharacterModifierTag.DecreaseCurrentHealth:
+                        impreciseAttributes += modifierAmounts[modifier] / (AttributesParameters.STR_TO_ATTACKDAMAGE + AttributesParameters.AGI_TO_ATTACKDAMAGE);
+                        break;
+                    case CharacterModifierTag.DecreaseCurrentMana:
+                        impreciseAttributes += modifierAmounts[modifier] / AttributesParameters.INT_TO_MAX_MANAPOOL;
+                        break;
+                    case CharacterModifierTag.DecreaseMovementSpeed:
+                        impreciseAttributes += modifierAmounts[modifier] / (AttributesParameters.STR_TO_MOVESPEED + AttributesParameters.AGI_TO_MOVESPEED);
+                        break;
+                    case CharacterModifierTag.ReduceAttackSpeed:
+                        impreciseAttributes += modifierAmounts[modifier] / AttributesParameters.AGI_TO_ATTACKSPEED;
+                        break;
+                    case CharacterModifierTag.DecreaseArmor:
+                        impreciseAttributes += modifierAmounts[modifier] / (AttributesParameters.STR_TO_ARMOR + AttributesParameters.AGI_TO_ARMOR);
+                        break;
+                    case CharacterModifierTag.DecreaseNegation:
+                        impreciseAttributes += modifierAmounts[modifier] / AttributesParameters.INT_TO_NEGATION;
+                        break;
+                    case CharacterModifierTag.DecreaseMagicalResistance:
+                        impreciseAttributes += modifierAmounts[modifier] / AttributesParameters.NEGATION_TO_MAGRESIST / AttributesParameters.INT_TO_NEGATION;
+                        break;
+                    case CharacterModifierTag.DecreasePhysicalResistance:
+                        impreciseAttributes += modifierAmounts[modifier] / AttributesParameters.ARMOR_TO_PHYSRESIST / (AttributesParameters.STR_TO_ARMOR + AttributesParameters.AGI_TO_ARMOR);
+                        break;
+                    case CharacterModifierTag.DecreaseDebuffResistance:
+                        impreciseAttributes += modifierAmounts[modifier] / (AttributesParameters.ARMOR_TO_PHYSRESIST + AttributesParameters.NEGATION_TO_MAGRESIST) / 
+                                               (Mathf.Max(AttributesParameters.ARMOR_TO_PHYSRESIST, AttributesParameters.NEGATION_TO_MAGRESIST) - 
+                                                Mathf.Min(AttributesParameters.ARMOR_TO_PHYSRESIST, AttributesParameters.NEGATION_TO_MAGRESIST));
+                        break;
+                    case CharacterModifierTag.DecreaseAttackDamage:
+                        impreciseAttributes += modifierAmounts[modifier] / (AttributesParameters.STR_TO_ATTACKDAMAGE + AttributesParameters.AGI_TO_ATTACKDAMAGE);
+                        break;
+                    case CharacterModifierTag.DecreaseMaxHealth:
+                        impreciseAttributes += modifierAmounts[modifier] / AttributesParameters.STR_TO_MAX_HEALTH;
+                        break;
+                    case CharacterModifierTag.DecreaseMaxManapool:
+                        impreciseAttributes += modifierAmounts[modifier] / AttributesParameters.INT_TO_MAX_MANAPOOL;
+                        break;
+                    case CharacterModifierTag.DecreaseHealthRegen:
+                        impreciseAttributes += modifierAmounts[modifier] / AttributesParameters.STR_TO_HEALTHREGEN;
+                        break;
+                    case CharacterModifierTag.DecreaseManaRegen:
+                        impreciseAttributes += modifierAmounts[modifier] / AttributesParameters.INT_TO_MANAREGEN;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return Mathf.CeilToInt(impreciseAttributes);
+        }
+
+        public static int ComputeUnspecifiedAttributeSumFromAbilities(BaseAbilityData[] abilities)
+        {
+            return 0;
         }
     
         

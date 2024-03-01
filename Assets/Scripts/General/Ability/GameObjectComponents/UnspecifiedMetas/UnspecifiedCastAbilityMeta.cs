@@ -10,7 +10,7 @@ namespace AutoChessRPG
 {
     public class UnspecifiedCastAbilityMeta : UnspecifiedAbilityMeta, ICastAbilityMeta
     {
-        [SerializeField] private CastAbilityData data;
+        [SerializeField] private BaseCastAbilityData data;
         
         public IEnumerator OnCast(AbilityTargetPacket target)
         {
@@ -31,9 +31,9 @@ namespace AutoChessRPG
         
         public void OnCastSucceeded(AbilityTargetPacket target)
         {
-            Debug.Log($"Used ability against {target}");
+            Debug.Log($"Used baseAbility against {target}");
         }
 
-        public CastAbilityData GetData() => data;
+        public BaseCastAbilityData GetData() => data;
     }
 }

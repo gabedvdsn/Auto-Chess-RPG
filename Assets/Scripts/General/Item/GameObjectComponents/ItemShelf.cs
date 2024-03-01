@@ -6,23 +6,23 @@ namespace AutoChessRPG
 {
     public class ItemShelf : ObservableSubject
     {
-        private Dictionary<ItemData, float> shelf;
+        private Dictionary<BaseItemData, float> shelf;
         private List<ItemRecord> records;
 
-        public bool PassItemsOnInstantiation(ItemData[] items)
+        public bool PassItemsOnInstantiation(BaseItemData[] items)
         {
             if (shelf is not null) return false;
 
-            shelf = new Dictionary<ItemData, float>();
+            shelf = new Dictionary<BaseItemData, float>();
 
-            foreach (ItemData item in items) shelf[item] = 0f;
+            foreach (BaseItemData item in items) shelf[item] = 0f;
 
             return true;
         }
 
-        public bool OnUseItem(ItemData item)
+        public bool OnUseItem(BaseItemData baseItem)
         {
-            if (item.GetAttachedAbilities().Length > 0)
+            if (baseItem.GetAttachedAbilities().Length > 0)
             {
                 
             }
@@ -30,19 +30,19 @@ namespace AutoChessRPG
             return true;
         }
 
-        private bool ItemIsOffCooldown(ItemData ability) => shelf[ability] <= 0f;
+        private bool ItemIsOffCooldown(BaseItemData ability) => shelf[ability] <= 0f;
     }
 
     public struct ItemRecord : IObservableData
     {
-        public ItemData baseData;
+        public BaseItemData baseData;
 
         public float timeInitial;
         public float timeFinal;
 
         public Dictionary<Character, EffectRecord> itemImpact;
 
-        public ItemRecord(ItemData _baseData, float _timeInitial)
+        public ItemRecord(BaseItemData _baseData, float _timeInitial)
         {
             baseData = _baseData;
 

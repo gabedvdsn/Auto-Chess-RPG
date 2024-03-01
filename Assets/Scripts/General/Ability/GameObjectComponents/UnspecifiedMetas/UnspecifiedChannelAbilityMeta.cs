@@ -9,7 +9,7 @@ namespace AutoChessRPG
 {
     public class UnspecifiedChannelAbilityMeta : UnspecifiedAbilityMeta, IChannelAbilityMeta
     {
-        [SerializeField] private ChannelAbilityData data;
+        [SerializeField] private ChannelBaseAbilityData data;
 
         protected bool isChanneling;
         
@@ -34,7 +34,7 @@ namespace AutoChessRPG
             if (!interrupted)
             {
                 OnChannelBeginPerforming(target);
-                StartCoroutine(DoAbilityCooldown(data.GetAbilityCooldown()));  // start cooldown as soon as the ability is used
+                StartCoroutine(DoAbilityCooldown(data.GetAbilityCooldown()));  // start cooldown as soon as the baseAbility is used
             }
             else
             {
@@ -45,7 +45,7 @@ namespace AutoChessRPG
 
         public bool OnChannelStart(AbilityTargetPacket target)
         {
-            // If ability is on cooldown, return false
+            // If baseAbility is on cooldown, return false
             if (!offCooldown) return false;
             
             // Do cast time
@@ -58,7 +58,7 @@ namespace AutoChessRPG
                 return false;
             }
             
-            // Cast time succeeded and not interrupted, deploy ability and return true
+            // Cast time succeeded and not interrupted, deploy baseAbility and return true
             OnChannelBeginPerforming(target);
 
             return true;
@@ -89,7 +89,7 @@ namespace AutoChessRPG
 
         public bool OnChannelFinished()
         {
-            Debug.Log($"Used ability");
+            Debug.Log($"Used baseAbility");
 
             StartCoroutine(DoAbilityCooldown(data.GetAbilityCooldown()));
 

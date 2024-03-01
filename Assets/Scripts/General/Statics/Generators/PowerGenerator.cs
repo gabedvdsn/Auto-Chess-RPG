@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace AutoChessRPG
 {
     public static class PowerGenerator
@@ -39,29 +42,71 @@ namespace AutoChessRPG
         private static float CalculateItemRarityPowerMultiplier(int rarity) => 1 + rarity * ITEM_POWER_COEFFICIENT_RARITY;
 
         private static float CalculateItemLevelPowerMultiplier(int level) => 1 + level * ITEM_POWER_COEFFICIENT_LEVEL;
-        
-        public static int GetItemPower(ItemData item)
+
+        public static int GetItemPower(RealItemData realItem)
         {
             /*
              * For items, we sum attributes AND consider stats, because (in this case) stats are not consequences of attributes
+             * For attachedAbilities, we do consider their power but NOT their power level multipliers
              */
             int sumPower = 0;
 
             // power of attached attributes
-            sumPower += item.GetAttachedAttributes().Strength();
-            sumPower += item.GetAttachedAttributes().Agility();
-            sumPower += item.GetAttachedAttributes().Intelligence();
+            sumPower += realItem.GetAttachedAttributes().GetAttributeSum();
 
             // estimated power of attached stats
-            sumPower += StatsGenerator.ComputeUnspecifiedAttributeSumFromStatPacket(item.GetAttachedStats());
-            
+            sumPower += StatsGenerator.ComputeUnspecifiedAttributeSumFromStatPacket(realItem.GetBaseData().GetAttachedStats());
+
             // estimated power of attached abilities
-            sumPower += 
+            foreach (RealAbilityData ability in realItem.GetAttachedAbilities())
+            {
+                int abilityPower = GetAbilityPower(ability);
+
+                // Remove multipliers
+                abilityPower = Mathf.CeilToInt(abilityPower / CalculateAbilityRarityPowerMultiplier((int)ability.GetBasePowerPacket().rarity));
+                abilityPower = Mathf.CeilToInt(abilityPower / CalculateAbilityLevelPowerMultiplier(ability.GetPowerPacket().level));
+
+                sumPower += abilityPower;
+            }
 
             // Apply PowerPacket multipliers
-            return sumPower * CalculateCharacterRarityPowerMultiplier(character.GetCharacterPowerPacket().rarity) * CalculateCharacterLevelPowerMultiplier(character.GetCharacterPowerPacket().level);
+            return Mathf.CeilToInt(sumPower * CalculateCharacterRarityPowerMultiplier((int)realItem.GetBasePowerPacket().rarity) *
+                                   CalculateCharacterLevelPowerMultiplier(realItem.GetPowerPacket().level));
+        }
 
 
+        #endregion
+        
+        #region Ability Power
+        
+        private const float ABILITY_POWER_COEFFICIENT_RARITY = .25f;
+        private const float ABILITY_POWER_COEFFICIENT_LEVEL = .35f;
+        
+        private static float CalculateAbilityRarityPowerMultiplier(int rarity) => 1 + rarity * ABILITY_POWER_COEFFICIENT_RARITY;
+
+        private static float CalculateAbilityLevelPowerMultiplier(int level) => 1 + level * ABILITY_POWER_COEFFICIENT_LEVEL;
+
+        public static int GetAbilityPower(RealAbilityData realAbility)
+        {
+            /*
+             * For items, we sum attributes AND consider stats with regard to attachedEffects ONLY, because (in this case) stats are not consequences of attributes
+             */
+
+            Dictionary<CharacterModifierTag, float> modifierValues = new Dictionary<CharacterModifierTag, float>();
+            
+            foreach (BaseEffectData effect in realAbility.GetBaseData().GetEffects())
+            {
+                if (modifierValues.ContainsKey(effect.GetModifier())) modifierValues[effect.GetModifier()] += effect.GetEffectAmount();
+                else modifierValues[effect.GetModifier()] = effect.GetEffectAmount();
+            }
+
+            int sumPower = StatsGenerator.ComputeUnspecifiedAttributeSumFromModifierValues(modifierValues);
+            
+            // Apply PowerPacket multipliers
+            return Mathf.CeilToInt(sumPower * CalculateAbilityRarityPowerMultiplier((int)realAbility.GetBasePowerPacket().rarity) *
+                                   CalculateAbilityLevelPowerMultiplier(realAbility.GetPowerPacket().level));
+        }
+        
         #endregion
     }
 }

@@ -8,11 +8,11 @@ namespace AutoChessRPG
 {
     // AbilityShelf is a Mono component attached to character units
     // AbilityShelf contains all character's abilities
-    // AbilityShelf is responsible for managing cooldowns and ability deployment
+    // AbilityShelf is responsible for managing cooldowns and baseAbility deployment
     public class AbilityShelf : ObservableSubject
     {
-        private Dictionary<int, AbilityData> shelf;
-        private Dictionary<AbilityData, float> cooldowns;
+        private Dictionary<int, BaseAbilityData> shelf;
+        private Dictionary<BaseAbilityData, float> cooldowns;
         private List<AbilityRecord> records;
 
         private int size;
@@ -29,25 +29,25 @@ namespace AutoChessRPG
 
         }
 
-        public bool MoveAbility(AbilityData ability, int slotToMoveTo)
+        public bool MoveAbility(BaseAbilityData baseAbility, int slotToMoveTo)
         {
-            if (shelf.Values.Contains(ability)) return false;
+            if (shelf.Values.Contains(baseAbility)) return false;
 
             int currSlot = 0;
 
-            foreach (int slot in shelf.Keys.Where(slot => shelf[slot] == ability)) currSlot = slot;
+            foreach (int slot in shelf.Keys.Where(slot => shelf[slot] == baseAbility)) currSlot = slot;
 
             int newSlot = Mathf.Clamp(slotToMoveTo, 0, size - 1);
 
             if (shelf[newSlot] is not null)
             {
-                AbilityData displacedAbility = shelf[newSlot];
-                shelf[newSlot] = ability;
-                shelf[currSlot] = displacedAbility;
+                BaseAbilityData displacedBaseAbility = shelf[newSlot];
+                shelf[newSlot] = baseAbility;
+                shelf[currSlot] = displacedBaseAbility;
             }
             else
             {
-                shelf[newSlot] = ability;
+                shelf[newSlot] = baseAbility;
                 shelf[currSlot] = null;
             }
 
@@ -56,10 +56,10 @@ namespace AutoChessRPG
             
         }
 
-        public bool AddAbility(AbilityData ability, int abilitySlot)
+        public bool AddAbility(BaseAbilityData baseAbility, int abilitySlot)
         {
             if (shelf.Count + 1 > size) return false;
-            if (shelf.Values.Contains(ability)) return false;
+            if (shelf.Values.Contains(baseAbility)) return false;
 
             int slot = Mathf.Clamp(abilitySlot, 0, size - 1);
 
@@ -71,20 +71,20 @@ namespace AutoChessRPG
                 }
             }
 
-            shelf[slot] = ability;
-            cooldowns[ability] = 0f;
+            shelf[slot] = baseAbility;
+            cooldowns[baseAbility] = 0f;
 
             return true;
         }
 
-        public bool RemoveAbility(AbilityData ability)
+        public bool RemoveAbility(BaseAbilityData baseAbility)
         {
-            if (!shelf.Values.Contains(ability)) return false;
+            if (!shelf.Values.Contains(baseAbility)) return false;
 
-            int i = shelf.Keys.TakeWhile(abilitySlot => shelf[abilitySlot] != ability).Count();
+            int i = shelf.Keys.TakeWhile(abilitySlot => shelf[abilitySlot] != baseAbility).Count();
 
             shelf[i] = null;
-            cooldowns.Remove(ability);
+            cooldowns.Remove(baseAbility);
 
             return true;
         }
@@ -93,15 +93,15 @@ namespace AutoChessRPG
         {
             if (shelf[abilitySlot] is null) return false;
 
-            AbilityData ability = shelf[abilitySlot];
+            BaseAbilityData baseAbility = shelf[abilitySlot];
 
             shelf[abilitySlot] = null;
-            cooldowns.Remove(ability);
+            cooldowns.Remove(baseAbility);
 
             return true;
         }
 
-        public bool Initialize(int shelfSize, AbilityData[] abilities)
+        public bool Initialize(int shelfSize, BaseAbilityData[] abilities)
         {
             if (cooldowns is not null) return false;
 
@@ -109,7 +109,7 @@ namespace AutoChessRPG
             
             FillShelfWithNull();
 
-            cooldowns = new Dictionary<AbilityData, float>();
+            cooldowns = new Dictionary<BaseAbilityData, float>();
 
             for (int i = 0; i < size; i++)
             {
@@ -129,24 +129,24 @@ namespace AutoChessRPG
 
         
 
-        public bool OnUseAbility(AbilityData ability)
+        public bool OnUseAbility(BaseAbilityData baseAbility)
         {
             return true;
         }
 
-        private bool AbilityIsOffCooldown(AbilityData ability) => cooldowns[ability] <= 0f;
+        private bool AbilityIsOffCooldown(BaseAbilityData baseAbility) => cooldowns[baseAbility] <= 0f;
     }
 
     public struct AbilityRecord : IObservableData
     {
-        public AbilityData baseData;
+        public BaseAbilityData baseData;
 
         public float timeInitial;
         public float timeFinal;
 
         public Dictionary<Character, EffectRecord> abilityImpact;
 
-        public AbilityRecord(AbilityData _baseData, float _timeInitial)
+        public AbilityRecord(BaseAbilityData _baseData, float _timeInitial)
         {
             baseData = _baseData;
             

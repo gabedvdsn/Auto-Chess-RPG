@@ -7,8 +7,8 @@ namespace AutoChessRPG
     public class EncounterPreferencesPacket
     {
         public Dictionary<ReTargetPreference, ReTargetMethod> retargetPreferences = EncounterParameters.GetDefaultReTargetPreferences();
-        public Dictionary<AbilityData, CastUsagePreference> abilityUsagePreferences = EncounterParameters.GetDefaultAbilityUsagePreferences();
-        public Dictionary<ItemData, CastUsagePreference> itemUsagePreferences = EncounterParameters.GetDefaultItemUsagePreferences();
+        public Dictionary<BaseAbilityData, CastUsagePreference> abilityUsagePreferences = EncounterParameters.GetDefaultAbilityUsagePreferences();
+        public Dictionary<BaseItemData, CastUsagePreference> itemUsagePreferences = EncounterParameters.GetDefaultItemUsagePreferences();
 
     }
 }
