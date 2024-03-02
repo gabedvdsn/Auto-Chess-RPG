@@ -29,7 +29,7 @@ namespace AutoChessRPG
             sumPower += character.GetCharacterData().GetAttributes().Intelligence();
 
             // Apply PowerPacket multipliers
-            return sumPower * CalculateCharacterRarityPowerMultiplier(character.GetCharacterPowerPacket().rarity) * CalculateCharacterLevelPowerMultiplier(character.GetCharacterPowerPacket().level);
+            return sumPower * CalculateCharacterRarityPowerMultiplier((int)character.GetCharacterPowerPacket().basePacket.rarity) * CalculateCharacterLevelPowerMultiplier(character.GetCharacterPowerPacket().level);
         }
         
         #endregion
@@ -105,6 +105,31 @@ namespace AutoChessRPG
             // Apply PowerPacket multipliers
             return Mathf.CeilToInt(sumPower * CalculateAbilityRarityPowerMultiplier((int)realAbility.GetBasePowerPacket().rarity) *
                                    CalculateAbilityLevelPowerMultiplier(realAbility.GetPowerPacket().level));
+        }
+        
+        #endregion
+        
+        #region Other
+
+        private const float POWER_COEFFICIENT_DELTA_CAST_TIME = .15f;
+        
+        private const float POWER_COEFFICIENT_DELTA_COOLDOWN = .75f;
+        
+        public static int GetNewPowerFromDeltaCastTime(float currPower, float oldCastTime, float newCastTime)
+        {
+            float ratio = 1 - newCastTime / oldCastTime;  // >0 is an improvement, <0 is a worsening
+            float deltaPowerRatio = Mathf.Max(0, 1 + ratio * POWER_COEFFICIENT_DELTA_CAST_TIME);
+
+            return deltaPowerRatio == 0 ? 1 : Mathf.CeilToInt(currPower * deltaPowerRatio);
+
+        }
+
+        public static int GetNewPowerFromDeltaCooldown(float currPower, float oldCooldown, float newCooldown)
+        {
+            float ratio = 1 - newCooldown / oldCooldown;  // >0 is an improvement, <0 is a worsening
+            float deltaPowerRatio = Mathf.Max(0, 1 + ratio * POWER_COEFFICIENT_DELTA_COOLDOWN);
+
+            return deltaPowerRatio == 0 ? 1 : Mathf.CeilToInt(currPower * deltaPowerRatio);
         }
         
         #endregion

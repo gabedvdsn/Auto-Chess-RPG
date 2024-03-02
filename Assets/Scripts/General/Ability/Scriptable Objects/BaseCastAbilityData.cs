@@ -44,15 +44,21 @@ namespace AutoChessRPG
 
         public override bool LevelUp()
         {
-            // Implemented abilities will also need to implement their own level up functionality
-            
             if (!base.LevelUp()) return false;
 
+            GetPowerPacket().power = PowerGenerator.GetNewPowerFromDeltaCastTime(GetPowerPacket().power, castTime, castTime + baseData.GetLevelUpAbilityCastTime());
+            GetPowerPacket().power = PowerGenerator.GetNewPowerFromDeltaCooldown(GetPowerPacket().power, cooldown, cooldown + baseData.GetLevelUpAbilityCooldown());
+            
+                
             castTime += baseData.GetLevelUpAbilityCastTime();
             cooldown += baseData.GetLevelUpAbilityCooldown();
 
             return true;
         }
+
+        public float GetRealCastTime() => castTime;
+
+        public float GetRealCooldown() => cooldown;
 
         public BaseCastAbilityData GetBaseCastData() => baseData;
     }

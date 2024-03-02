@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using AutoChessRPG.Entity.Character;
 using JetBrains.Annotations;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace AutoChessRPG
 {
     public class UnspecifiedChannelAbilityMeta : UnspecifiedAbilityMeta, IChannelAbilityMeta
     {
-        [SerializeField] private ChannelBaseAbilityData data;
+        private RealChannelAbilityData data;
+        [SerializeField] private bool beginCooldownBeforeChannel = true;
 
         protected bool isChanneling;
         
@@ -25,16 +27,26 @@ namespace AutoChessRPG
 
         }
 
+        public bool Instantiate(RealChannelAbilityData abilityData)
+        {
+            if (data is not null) return false;
+
+            data = abilityData;
+
+            return true;
+        }
+
         public IEnumerator OnChannel(AbilityTargetPacket target)
         {
             if (!offCooldown) yield break;
             
-            yield return StartCoroutine(DoAbilityCastTime(data.GetAbilityCastTime()));
+            yield return StartCoroutine(DoAbilityCastTime(data.GetRealCastTime()));
 
             if (!interrupted)
             {
-                OnChannelBeginPerforming(target);
-                StartCoroutine(DoAbilityCooldown(data.GetAbilityCooldown()));  // start cooldown as soon as the baseAbility is used
+                StartCoroutine(OnChannelPerform(target));
+                
+                if (beginCooldownBeforeChannel) StartCoroutine(DoAbilityCooldown(data.GetRealCooldown()));
             }
             else
             {
@@ -43,55 +55,48 @@ namespace AutoChessRPG
 
         }
 
-        public bool OnChannelStart(AbilityTargetPacket target)
+        public IEnumerator OnChannelPerform(AbilityTargetPacket target)
         {
-            // If baseAbility is on cooldown, return false
-            if (!offCooldown) return false;
-            
-            // Do cast time
-            StartCoroutine(DoAbilityCastTime(data.GetAbilityCastTime()));
+            float duration = 0f;
+            float ticks = 0f;
 
-            // If interrupted during cast time, reset flag and return false
-            if (interrupted)
+            while (duration < data.GetRealDuration())
             {
-                interrupted = false;
-                return false;
+                if (interrupted)
+                {
+                    interrupted = false;
+                    yield break;
+                }
+                
+                ticks += Time.deltaTime;
+
+                if (ticks > data.GetRealTickRate())
+                {
+                    Debug.Log("Doing stuff to" + target);
+
+                    ticks = 0f;
+                }
+                
+                duration += Time.deltaTime;
+
+                yield return null;
             }
-            
-            // Cast time succeeded and not interrupted, deploy baseAbility and return true
-            OnChannelBeginPerforming(target);
-
-            return true;
-        }
-
-        public bool OnChannelBeginPerforming(AbilityTargetPacket target)
-        {
-            isChanneling = true;
-            
-            // Check if interrupted
-            if (interrupted)
-            {
-                OnChannelFinished();
-                return false;
-            }
-
-            OnChannelPerform(target);
-            return true;
-        }
-
-        public bool OnChannelPerform(AbilityTargetPacket target)
-        {
-            // put channel performance logic here
-            Debug.Log("Channeling against " + target);
-
-            return !interrupted;
         }
 
         public bool OnChannelFinished()
         {
             Debug.Log($"Used baseAbility");
 
-            StartCoroutine(DoAbilityCooldown(data.GetAbilityCooldown()));
+            if (!beginCooldownBeforeChannel) StartCoroutine(DoAbilityCooldown(data.GetRealCooldown()));
+
+            return true;
+        }
+        
+        public bool OnChannelInterrupted()
+        {
+            if (!isChanneling) return false;
+            
+            interrupted = true;
 
             return true;
         }

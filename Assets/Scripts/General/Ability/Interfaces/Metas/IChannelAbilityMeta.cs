@@ -11,12 +11,10 @@ namespace AutoChessRPG
     {
         public IEnumerator OnChannel(AbilityTargetPacket target);
         
-        public bool OnChannelStart(AbilityTargetPacket target);  // baseAbility is called, do cast time
-
-        public bool OnChannelBeginPerforming(AbilityTargetPacket target);  // baseAbility call successful, start performance
-
-        public bool OnChannelPerform(AbilityTargetPacket target);  // channel performance logic
+        public IEnumerator OnChannelPerform(AbilityTargetPacket target);  // channel performance logic
         
         public bool OnChannelFinished();  // channel is finished
+
+        public bool OnChannelInterrupted();
     }
 }

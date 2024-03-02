@@ -111,7 +111,17 @@ namespace AutoChessRPG
         
         #endregion
         
-        #region Behaviour Tree
+        #region Behaviour
+
+        private void MoveToTarget()
+        {
+            
+        }
+
+        private void DoAction()
+        {
+            
+        }
 
         private void MainBranch()
         {

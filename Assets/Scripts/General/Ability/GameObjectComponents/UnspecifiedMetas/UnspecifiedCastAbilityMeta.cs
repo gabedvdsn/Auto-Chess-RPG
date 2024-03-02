@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -10,18 +11,30 @@ namespace AutoChessRPG
 {
     public class UnspecifiedCastAbilityMeta : UnspecifiedAbilityMeta, ICastAbilityMeta
     {
-        [SerializeField] private BaseCastAbilityData data;
+        protected RealCastAbilityData data;
+
+        protected delegate void OnCastSucceedDelegate(AbilityTargetPacket targetPacket);
+        protected OnCastSucceedDelegate OnCastSucceedAction;
+
+        public bool SendRealCastAbilityData(RealCastAbilityData abilityData)
+        {
+            if (data is not null) return false;
+
+            data = abilityData;
+
+            return true;
+        }
         
         public IEnumerator OnCast(AbilityTargetPacket target)
         {
             if (!offCooldown) yield break;
             
-            yield return StartCoroutine(DoAbilityCastTime(data.GetAbilityCastTime()));
+            yield return StartCoroutine(DoAbilityCastTime(data.GetRealCastTime()));
             
             if (!interrupted)
             {
                 OnCastSucceeded(target);
-                StartCoroutine(DoAbilityCooldown(data.GetAbilityCooldown()));
+                StartCoroutine(DoAbilityCooldown(data.GetRealCooldown()));
             }
             else
             {
@@ -31,9 +44,9 @@ namespace AutoChessRPG
         
         public void OnCastSucceeded(AbilityTargetPacket target)
         {
-            Debug.Log($"Used baseAbility against {target}");
+            OnCastSucceedAction(target);
         }
 
-        public BaseCastAbilityData GetData() => data;
+        public BaseCastAbilityData GetData() => data.GetBaseCastData();
     }
 }

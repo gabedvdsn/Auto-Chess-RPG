@@ -21,7 +21,8 @@ namespace AutoChessRPG
              *  affinity (affinity of loot drops, loosely) => a character with a certain affinity will drop items with that affinity, or no affinity
              *  attributes (type of loot drops, loosely) => a character with high relative int will drop items with high relative int
              */
-            
+
+            return new LootDropsPacket();
         }
     }
 }

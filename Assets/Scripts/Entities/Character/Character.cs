@@ -16,7 +16,7 @@ namespace AutoChessRPG
         private ItemShelf itemShelf;
 
         private StatPacket stats;
-        private PowerPacket _power;
+        private RealPowerPacket _power;
 
         private EncounterPreferencesPacket encounterPreferences;
         
@@ -43,7 +43,7 @@ namespace AutoChessRPG
 
             effectShelf.Initialize(this);
 
-            stats = AttributesParameters.ComputeStatPacketFromAttributePacket(characterData.GetAttributes());
+            stats = StatsGenerator.ComputeStatPacketFromAttributePacket(characterData.GetAttributes());
 
             return true;
         }
@@ -52,7 +52,7 @@ namespace AutoChessRPG
         
         public StatPacket GetCharacterStatPacket() => stats;
 
-        public PowerPacket GetCharacterPowerPacket() => _power;
+        public RealPowerPacket GetCharacterPowerPacket() => _power;
 
         public AbilityShelf GetCharacterAbilityShelf() => abilityShelf;
         

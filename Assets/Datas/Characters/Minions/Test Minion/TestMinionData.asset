@@ -12,9 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2ea99a504981294f9de8d0e027be201, type: 3}
   m_Name: TestMinionData
   m_EditorClassIdentifier: 
+  entityLookupName: TEST_MINION_00001
   entityName: Test minion
-  description: This is a test minion
-  entityID: 000
+  entityDescription: This is a test character (00001)
+  entityID: T-00001
   characterRace: 3
-  characterAffinity: 2
-  characterAttributes: {fileID: 0}
+  characterAffinities: 00000000
+  characterAttributes:
+    strength: 15
+    agility: 15
+    intelligence: 15
+  movementSpeed: 5
+  turnSpeed: 5
+  allowableActionRange: 90
