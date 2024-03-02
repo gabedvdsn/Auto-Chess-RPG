@@ -5,7 +5,6 @@ namespace AutoChessRPG
 {
     public class BFollowTarget : BTargeted
     {
-        
         private float speed;
         private Vector3 direction;
 
@@ -32,9 +31,9 @@ namespace AutoChessRPG
         
         protected virtual void FollowTarget()
         {
-            direction = target.position - transform.position;
+            direction = (target.position - transform.position).normalized;
             
-            rb.velocity = direction * (speed * Time.deltaTime);
+            rb.velocity = direction * speed;
         }
     }
 }

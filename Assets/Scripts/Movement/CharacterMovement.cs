@@ -8,38 +8,51 @@ namespace AutoChessRPG
 {
     public class CharacterMovement : MonoBehaviour
     {
-        private CharacterController controller;
-        
+        private Rigidbody rb;
+
+        private bool hasTargetPosition;
         private Vector3 targetPosition;
+
+        private readonly float distanceDampenerRange = .65f;
+        private float distanceToTarget;
         
         private Vector3 movementDirection;
-        [SerializeField] private Vector3 lookDirection;
+        private Vector3 lookDirection;
         
         private float turnSmoothTime;
         private float turnSmoothVelocity;
-
-        private float lookCoef;
         
-        [SerializeField] private float moveSpeed;
-        [SerializeField] private float rotationSpeed;
-        [SerializeField] [Range(0, 90)] private float allowableRangeForMovement;
-        [SerializeField] private float degreesToTarget;
+        private float moveSpeed;
+        private float rotationSpeed;
+        private float allowableRangeForMovement;
+        
+        private float degreesToTarget;
 
         private void Awake()
         {
-            controller = GetComponent<CharacterController>();
-
+            rb = GetComponent<Rigidbody>();
             lookDirection = transform.forward;
+        }
+
+        public void Initialize(float _moveSpeed, float _rotationSpeed, float _allowableRangeForMovement)
+        {
+            moveSpeed = _moveSpeed;
+            rotationSpeed = _rotationSpeed;
+            allowableRangeForMovement = _allowableRangeForMovement;
         }
 
         public void SendTargetPosition(Vector3 _targetPosition)
         {
+            Debug.Log($"Moving to {_targetPosition}");
             if (_targetPosition == transform.position) return;
 
             targetPosition = _targetPosition;
+            targetPosition.y = transform.position.y;
             
             lookDirection = (targetPosition - transform.position).normalized;
             lookDirection.y = 0f;
+            
+            hasTargetPosition = true;
         }
 
         public float GetDegreesToTarget() => degreesToTarget;
@@ -63,17 +76,34 @@ namespace AutoChessRPG
         
         private void Move()
         {
-            movementDirection = (targetPosition - transform.position).normalized;
-
-            if (!(movementDirection.magnitude > 0.1f)) return;
-
-            if (!(degreesToTarget < allowableRangeForMovement)) return;
+            if (!hasTargetPosition) return;
             
-            // float targetAngle = Mathf.Atan2(movementDirection.x, movementDirection.y) * Mathf.Rad2Deg - 90f;
-            // float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            // transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            movementDirection = (targetPosition - transform.position).normalized;
+            distanceToTarget = Vector3.Distance(transform.position, targetPosition);
 
-            controller.Move(movementDirection * (moveSpeed * Time.deltaTime * Mathf.Clamp01(1 - degreesToTarget / allowableRangeForMovement)));
+            if (distanceToTarget < .1)
+            {
+                hasTargetPosition = false;
+                SetZeroVelocity();
+                return;
+            }
+
+            if (!(movementDirection.magnitude > 0.1f) || !(degreesToTarget < allowableRangeForMovement))
+            {
+                SetZeroVelocity();
+                return;
+            }
+
+            rb.velocity = movementDirection * (moveSpeed * RotationSpeedDampener() * DistanceToTargetSpeedDampener());
+        }
+
+        private float RotationSpeedDampener() => Mathf.Clamp01(1 - degreesToTarget / allowableRangeForMovement);
+
+        private float DistanceToTargetSpeedDampener() => distanceToTarget < distanceDampenerRange ? Mathf.Lerp(0, 1, distanceToTarget / distanceDampenerRange) : 1f;
+
+        private void SetZeroVelocity()
+        {
+            rb.velocity = Vector3.zero;
         }
 
     }

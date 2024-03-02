@@ -15,9 +15,11 @@ namespace AutoChessRPG
             base.Initialize(_targetGO, _speed);
         }
 
-        private void OnCollisionEnter(Collision other)
+        private void OnTriggerEnter(Collider other)
         {
             if (other.gameObject != targetGO) return;
+            
+            Debug.Log($"{gameObject} collided with {other.gameObject.GetComponent<EncounterAutoCharacterController>().GetAffiliation()} {other.gameObject}");
 
             onCollision(other.gameObject.GetComponent<EncounterAutoCharacterController>());
 

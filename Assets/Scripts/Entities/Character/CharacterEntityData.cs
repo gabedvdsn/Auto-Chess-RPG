@@ -17,7 +17,7 @@ namespace AutoChessRPG
 
         [Header("Physical Information")] 
         [SerializeField] private float movementSpeed = 5f;
-        [SerializeField] private float turnSpeed = 5f;
+        [SerializeField] private float rotationSpeed = 5f;
         [SerializeField] [Range(0, 90f)] private float allowableActionRange = 90f;
 
         private void OnValidate()
@@ -33,7 +33,7 @@ namespace AutoChessRPG
 
         public float GetMovementSpeed() => movementSpeed;
 
-        public float GetTurnSpeed() => turnSpeed;
+        public float GetRotationSpeed() => rotationSpeed;
 
         public float GetAllowableActionRange() => allowableActionRange;
     }

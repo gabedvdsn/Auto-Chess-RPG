@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2ea99a504981294f9de8d0e027be201, type: 3}
+  m_Name: TestCharacterData
+  m_EditorClassIdentifier: 
+  entityLookupName: TEST_CHARACTER_0001
+  entityName: Test Character
+  entityDescription: This is a test character (00001)
+  entityID: T-00001
+  characterRace: 0
+  characterAffinities: 00000000
+  characterAttributes:
+    strength: 15
+    agility: 15
+    intelligence: 15
+  movementSpeed: 5
+  rotationSpeed: 5
+  allowableActionRange: 90

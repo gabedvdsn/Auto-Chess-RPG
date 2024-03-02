@@ -9,6 +9,9 @@ namespace AutoChessRPG
 {
     public class EncounterAutoCharacterController : ObservableSubject
     {
+        // Encounter information
+        private Affiliation affiliation;
+        
         // Individual information
         private Character character;
         private CharacterMovement movement;
@@ -28,7 +31,7 @@ namespace AutoChessRPG
 
         private bool canAttack;
         private bool canCast;
-        private bool canMove;
+        private bool canMove = true;
 
         private bool canAct
         {
@@ -73,14 +76,20 @@ namespace AutoChessRPG
             Move();
         }
 
-        public void Initialize(EncounterPreferencesPacket _preferences)
+        public void Initialize(Affiliation _affiliation, EncounterPreferencesPacket _preferences)
         {
             character = GetComponent<Character>();
-            movement = GetComponentInChildren<CharacterMovement>();
-
             data = character.GetCharacterData();
+            
+            movement = GetComponentInChildren<CharacterMovement>();
+            movement.Initialize(character.GetCharacterData().GetMovementSpeed(), 
+                character.GetCharacterData().GetRotationSpeed(), 
+                character.GetCharacterData().GetAllowableActionRange());
+            
             stats = character.GetCharacterStatPacket();
             preferences = _preferences;
+
+            affiliation = _affiliation;
             
             InitialReTargetPreferenceCheck();
         }
@@ -97,6 +106,8 @@ namespace AutoChessRPG
         
         #region Getters
 
+        public Affiliation GetAffiliation() => affiliation;
+        
         public Character GetCharacter() => character;
 
         public StatPacket GetCharacterStatPacket() => character.GetCharacterStatPacket();

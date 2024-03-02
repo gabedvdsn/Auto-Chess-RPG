@@ -10,15 +10,12 @@ namespace AutoChessRPG
         [SerializeField] protected GameObject projectilePrefab;
         [SerializeField] protected float projectileSpeed;
 
+        protected Action<EncounterAutoCharacterController> onProjectileHitAction;
+
         protected virtual void ShootProjectile(GameObject target)
         {
             GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-            projectile.GetComponent<BFollowAndCollideWithController>().Initialize(target, projectileSpeed, OnProjectileHit);
-        }
-
-        protected virtual void OnProjectileHit(EncounterAutoCharacterController target)
-        {
-            // Do stuff to target that was hit
+            projectile.GetComponent<BFollowAndCollideWithController>().Initialize(target, projectileSpeed, onProjectileHitAction);
         }
 
         private void OnValidate()

@@ -15,7 +15,8 @@ namespace AutoChessRPG
 
         public void ThisDestroy()
         {
-            Destroy(this);
+            Debug.Log($"Destroying projectile {gameObject}");
+            Destroy(gameObject);
         }
         
         private void OnValidate()
