@@ -30,6 +30,8 @@ namespace AutoChessRPG
             stats.healthRegen = attributes.Strength() * AttributesParameters.STR_TO_HEALTHREGEN;
             stats.manaRegen = attributes.Intelligence() * AttributesParameters.INT_TO_MANAREGEN;
 
+            stats.rotationSpeed = stats.moveSpeed;
+
             return stats;
         }
 

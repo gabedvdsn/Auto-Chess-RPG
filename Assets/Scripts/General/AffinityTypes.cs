@@ -12,6 +12,7 @@ namespace AutoChessRPG
         Earth,
         Air,
         Void,
-        Plague
+        Plague,
+        None
     }
 }

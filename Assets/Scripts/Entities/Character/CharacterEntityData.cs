@@ -10,30 +10,27 @@ namespace AutoChessRPG
     [CreateAssetMenu(menuName = "Scriptable Objects/Character Entity/Character Base", fileName = "Character")]
     public class CharacterEntityData : EntityBaseData
     {
-        [Header("Character Information")] 
+        [Header("Character Information")]
+        [SerializeField] private bool isHero;
         [SerializeField] private Race characterRace;
-        [FormerlySerializedAs("characterAffinity")] [SerializeField] private Affinity[] characterAffinities;
+        [SerializeField] private Affinity[] characterAffinities;
         [SerializeField] private AttributePacket characterAttributes;
 
         [Header("Physical Information")] 
-        [SerializeField] private float movementSpeed = 5f;
-        [SerializeField] private float rotationSpeed = 5f;
         [SerializeField] [Range(0, 90f)] private float allowableActionRange = 90f;
 
         private void OnValidate()
         {
             
         }
+
+        public bool GetIsHero() => isHero;
         
         public Race GetCharacterRace() => characterRace;
 
         public Affinity[] GetCharacterAffinities() => characterAffinities;
         
         public AttributePacket GetAttributes() => characterAttributes;
-
-        public float GetMovementSpeed() => movementSpeed;
-
-        public float GetRotationSpeed() => rotationSpeed;
 
         public float GetAllowableActionRange() => allowableActionRange;
     }

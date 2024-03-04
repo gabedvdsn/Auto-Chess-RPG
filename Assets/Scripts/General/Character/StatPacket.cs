@@ -23,6 +23,8 @@ namespace AutoChessRPG
         public float manaRegen;
         public float debuffResistance;
 
+        public float rotationSpeed;
+
         public StatPacket() { }
 
         public bool ApplyModifier(CharacterModifierTag modifier, float value)
@@ -95,6 +97,8 @@ namespace AutoChessRPG
             healthRegen += other.healthRegen;
             manaRegen += other.manaRegen;
             debuffResistance += other.debuffResistance;
+
+            rotationSpeed = moveSpeed;
         }
         
     }
