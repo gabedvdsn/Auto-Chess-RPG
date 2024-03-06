@@ -81,7 +81,8 @@ namespace AutoChessRPG
             character = GetComponent<Character>();
             data = character.GetCharacterData();
             
-            movement = GetComponentInChildren<CharacterMovement>();
+            movement = GetComponent<CharacterMovement>();
+            Debug.Log(movement);
             movement.Initialize(character.GetCharacterStatPacket().moveSpeed, 
                 character.GetCharacterStatPacket().rotationSpeed, 
                 character.GetCharacterData().GetAllowableActionRange());

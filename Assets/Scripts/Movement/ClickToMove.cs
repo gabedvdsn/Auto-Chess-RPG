@@ -15,8 +15,6 @@ namespace AutoChessRPG
         {
             characterMovement = GetComponent<CharacterMovement>();
             cam = FindObjectOfType<Camera>();
-
-            Debug.Log(cam.name);
         }
 
         public void OnClickToMove(InputAction.CallbackContext context)
