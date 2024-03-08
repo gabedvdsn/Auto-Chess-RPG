@@ -21,9 +21,8 @@ namespace AutoChessRPG
         
         private float turnSmoothTime;
         private float turnSmoothVelocity;
-        
-        private float moveSpeed;
-        private float rotationSpeed;
+
+        private StatPacket stats;
         private float allowableRangeForMovement;
         
         private float degreesToTarget;
@@ -34,16 +33,14 @@ namespace AutoChessRPG
             lookDirection = transform.forward;
         }
 
-        public void Initialize(float _moveSpeed, float _rotationSpeed, float _allowableRangeForMovement)
+        public void Initialize(StatPacket _stats, float _allowableRangeForMovement)
         {
-            moveSpeed = _moveSpeed;
-            rotationSpeed = _rotationSpeed;
+            stats = _stats;
             allowableRangeForMovement = _allowableRangeForMovement;
         }
 
         public void SendTargetPosition(Vector3 _targetPosition)
         {
-            Debug.Log($"Moving to {_targetPosition}");
             if (_targetPosition == transform.position) return;
 
             targetPosition = _targetPosition;
@@ -67,7 +64,7 @@ namespace AutoChessRPG
         {
             degreesToTarget = Vector3.Angle(transform.forward, lookDirection);
             
-            Quaternion rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookDirection), rotationSpeed * Time.deltaTime);
+            Quaternion rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookDirection), stats.rotationSpeed * Time.deltaTime);
             rotation.x = 0;
             rotation.z = 0;
 
@@ -94,7 +91,7 @@ namespace AutoChessRPG
                 return;
             }
 
-            rb.velocity = movementDirection * (moveSpeed * RotationSpeedDampener() * DistanceToTargetSpeedDampener());
+            rb.velocity = movementDirection * (stats.moveSpeed * RotationSpeedDampener() * DistanceToTargetSpeedDampener());
         }
 
         private float RotationSpeedDampener() => Mathf.Clamp01(1 - degreesToTarget / allowableRangeForMovement);

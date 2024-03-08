@@ -14,7 +14,7 @@ namespace AutoChessRPG
         [SerializeField] private bool isHero;
         [SerializeField] private Race characterRace;
         [SerializeField] private Affinity[] characterAffinities;
-        [SerializeField] private AttributePacket characterAttributes;
+        [FormerlySerializedAs("characterAttributes")] [SerializeField] private BaseAttributePacket characterBaseAttributes;
 
         [Header("Physical Information")] 
         [SerializeField] [Range(0, 90f)] private float allowableActionRange = 90f;
@@ -30,7 +30,7 @@ namespace AutoChessRPG
 
         public Affinity[] GetCharacterAffinities() => characterAffinities;
         
-        public AttributePacket GetAttributes() => characterAttributes;
+        public BaseAttributePacket GetAttributes() => characterBaseAttributes;
 
         public float GetAllowableActionRange() => allowableActionRange;
     }

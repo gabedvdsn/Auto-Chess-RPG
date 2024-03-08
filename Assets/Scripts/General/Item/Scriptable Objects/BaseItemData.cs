@@ -12,13 +12,14 @@ namespace AutoChessRPG
         // This data includes items under the following categories: resource, spirit, construction, knowledge
         [Header("Base Item Data Information")] 
         [SerializeField] private ItemType itemType;
-        [SerializeField] private AttributePacket attachedAttributes;
+        [FormerlySerializedAs("attachedAttributes")] [SerializeField] private BaseAttributePacket attachedBaseAttributes;
         [SerializeField] private StatPacket attachedStats;
         [SerializeField] private BaseAbilityData[] attachedAbilities;
         [SerializeField] private BasePowerPacket power;
         
+        [FormerlySerializedAs("onLevelAttributes")]
         [Header("Level Up Information")]
-        [SerializeField] private AttributePacket onLevelAttributes;
+        [SerializeField] private BaseAttributePacket onLevelBaseAttributes;
         [SerializeField] private StatPacket onLevelStats;
 
 
@@ -27,14 +28,14 @@ namespace AutoChessRPG
 
         public BasePowerPacket GetPowerPacket() => power;
         
-        public AttributePacket GetAttachedAttributes() => attachedAttributes;
+        public BaseAttributePacket GetAttachedAttributes() => attachedBaseAttributes;
 
         public StatPacket GetAttachedStats() => attachedStats;
 
         public BaseAbilityData[] GetAttachedAbilities() => attachedAbilities;
         
         // Level Up Information Getters
-        public AttributePacket GetLevelUpAttachedAttributes() => onLevelAttributes;
+        public BaseAttributePacket GetLevelUpAttachedAttributes() => onLevelBaseAttributes;
         public StatPacket GetLevelUpAttachedStats() => onLevelStats;
     }
 
@@ -46,17 +47,17 @@ namespace AutoChessRPG
 
         private RealAbilityData[] attachedAbilities;
 
-        private AttributePacket attachedAttributes;
+        private RealAttributePacket _attachedBaseAttributes;
         private StatPacket attachedStats;
 
-        public RealItemData(BaseItemData _baseData, RealPowerPacket _power, RealAbilityData[] _attachedAbilities, AttributePacket _attachedAttributes, StatPacket _attachedStats)
+        public RealItemData(BaseItemData _baseData, RealPowerPacket _power, RealAbilityData[] _attachedAbilities, RealAttributePacket attachedBaseAttributes, StatPacket _attachedStats)
         {
             baseData = _baseData;
             power = _power;
 
             attachedAbilities = _attachedAbilities;
             
-            attachedAttributes = _attachedAttributes;
+            _attachedBaseAttributes = attachedBaseAttributes;
             attachedStats = _attachedStats;
         }
 
@@ -65,7 +66,7 @@ namespace AutoChessRPG
             if (!power.LevelUp()) return false;
 
             // Level up attached attributes
-            attachedAttributes.MergeOtherAttributePacket(baseData.GetLevelUpAttachedAttributes());
+            _attachedBaseAttributes.MergeOtherAttributePacket(baseData.GetLevelUpAttachedAttributes());
             
             // Level up attached stats
             attachedStats.MergeOtherStatPacket(baseData.GetLevelUpAttachedStats());
@@ -80,7 +81,7 @@ namespace AutoChessRPG
 
         public RealAbilityData[] GetAttachedAbilities() => attachedAbilities;
 
-        public AttributePacket GetAttachedAttributes() => attachedAttributes;
+        public RealAttributePacket GetAttachedAttributes() => _attachedBaseAttributes;
 
         public StatPacket GetAttachedStats() => attachedStats;
 

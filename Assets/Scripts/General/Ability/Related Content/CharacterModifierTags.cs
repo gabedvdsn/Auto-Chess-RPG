@@ -6,20 +6,20 @@ namespace AutoChessRPG
 {
     public enum CharacterModifierTag
     {
-        DecreaseCurrentHealth,
-        DecreaseCurrentMana,
-        DecreaseMovementSpeed,
-        ReduceAttackSpeed,
-        DecreaseArmor,
-        DecreaseNegation,
-        DecreaseMagicalResistance,
-        DecreasePhysicalResistance,
-        DecreaseDebuffResistance,
-        DecreaseAttackDamage,
-        DecreaseMaxHealth,
-        DecreaseMaxManapool,
-        DecreaseHealthRegen,
-        DecreaseManaRegen
+        ModifyCurrentHealth,
+        ModifyCurrentMana,
+        ModifyMovespeed,
+        ModifyAttackSpeed,
+        ModifyArmor,
+        ModifyNegation,
+        ModifyMagicalResistance,
+        ModifyPhysicalResistance,
+        ModifyDebuffResistance,
+        ModifyAttackDamage,
+        ModifyMaxHealth,
+        ModifyMaxMana,
+        ModifyHealthRegen,
+        ModifyManaRegen
     }
 
 }

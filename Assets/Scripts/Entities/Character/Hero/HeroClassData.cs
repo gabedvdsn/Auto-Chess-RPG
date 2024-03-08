@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AutoChessRPG.Entity.Character
 {
@@ -9,6 +10,6 @@ namespace AutoChessRPG.Entity.Character
     {
         [Header("Class Information")] 
         [SerializeField] private string className;
-        [SerializeField] private AttributePacket attributes;
+        [FormerlySerializedAs("attributes")] [SerializeField] private BaseAttributePacket baseAttributes;
     }
 }

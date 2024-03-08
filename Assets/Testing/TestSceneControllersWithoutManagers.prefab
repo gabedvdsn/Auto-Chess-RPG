@@ -44,8 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 161e76e6330de6948af32bcabf8d9356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  autoInitialize: 1
   controllersByAffiliation:
+    _serializedList: []
+  materialsByAffiliation:
     _serializedList:
     - Key: 0
-      Value:
-      - {fileID: 0}
+      Value: {fileID: 2100000, guid: 707d13cde0493f84bbcd61d51a4b1163, type: 2}
+    - Key: 1
+      Value: {fileID: 2100000, guid: a106baf5fa0ec6d40b5326affd095457, type: 2}

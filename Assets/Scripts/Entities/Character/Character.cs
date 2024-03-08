@@ -8,14 +8,13 @@ namespace AutoChessRPG
     {
         // Base Information
         [SerializeField] private CharacterEntityData characterData;
-
-        private Affiliation affiliation;
-
+        
         private EffectShelf effectShelf;
         private AbilityShelf abilityShelf;
         private ItemShelf itemShelf;
 
         private StatPacket stats;
+        private RealAttributePacket attributes;
         private RealPowerPacket _power;
 
         private EncounterPreferencesPacket encounterPreferences;
@@ -32,11 +31,9 @@ namespace AutoChessRPG
 
         }
 
-        public bool Initialize(Affiliation _affiliation)
+        public bool Initialize()
         {
-            if (effectShelf is null || abilityShelf is null) return false;
-
-            affiliation = _affiliation;
+            if (effectShelf is not null || abilityShelf is not null) return false;
             
             effectShelf = GetComponentInChildren<EffectShelf>();
             abilityShelf = GetComponentInChildren<AbilityShelf>();
@@ -44,6 +41,8 @@ namespace AutoChessRPG
             effectShelf.Initialize(this);
 
             stats = StatsGenerator.ComputeStatPacketFromAttributePacket(characterData.GetAttributes());
+            attributes = characterData.GetAttributes().ToRealAttributePacket();
+            Debug.Log(stats);
 
             return true;
         }
@@ -51,6 +50,8 @@ namespace AutoChessRPG
         #region Getters
         
         public StatPacket GetCharacterStatPacket() => stats;
+
+        public RealAttributePacket GetCharacterAttributePacket() => attributes;
 
         public RealPowerPacket GetCharacterPowerPacket() => _power;
 
@@ -63,8 +64,6 @@ namespace AutoChessRPG
         public CharacterEntityData GetCharacterData() => characterData;
 
         public EntityBaseData GetBaseData() => characterData;
-
-        public Affiliation GetAffiliation() => affiliation;
         
         #endregion
         

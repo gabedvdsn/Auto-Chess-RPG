@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AutoChessRPG
 {
@@ -8,7 +9,7 @@ namespace AutoChessRPG
     public class StatPacket
     {
         public float maxHealth;
-        public float maxManaPool;
+        public float maxMana;
         
         public float currHealth;
         public float currMana;
@@ -31,48 +32,48 @@ namespace AutoChessRPG
         {
             switch (modifier)
             {
-                case CharacterModifierTag.DecreaseArmor:
+                case CharacterModifierTag.ModifyArmor:
                     armor -= value;
                     break;
-                case CharacterModifierTag.DecreaseAttackDamage:
+                case CharacterModifierTag.ModifyAttackDamage:
                     attackDamage -= value;
                     break;
-                case CharacterModifierTag.DecreaseCurrentHealth:
+                case CharacterModifierTag.ModifyCurrentHealth:
                     currHealth -= value;
                     break;
-                case CharacterModifierTag.DecreaseCurrentMana:
+                case CharacterModifierTag.ModifyCurrentMana:
                     currMana -= value;
                     break;
-                case CharacterModifierTag.DecreaseDebuffResistance:
+                case CharacterModifierTag.ModifyDebuffResistance:
                     debuffResistance -= value;
                     break;
-                case CharacterModifierTag.DecreaseHealthRegen:
+                case CharacterModifierTag.ModifyHealthRegen:
                     healthRegen -= value;
                     break;
-                case CharacterModifierTag.DecreaseMagicalResistance:
+                case CharacterModifierTag.ModifyMagicalResistance:
                     magicResistance -= value;
                     break;
-                case CharacterModifierTag.DecreaseManaRegen:
+                case CharacterModifierTag.ModifyManaRegen:
                     manaRegen -= value;
                     break;
-                case CharacterModifierTag.DecreaseMaxHealth:
+                case CharacterModifierTag.ModifyMaxHealth:
                     maxHealth -= value;
                     currHealth *= maxHealth / (maxHealth + value);
                     break;
-                case CharacterModifierTag.DecreaseMaxManapool:
-                    maxManaPool -= value;
-                    currMana *= maxManaPool / (maxManaPool + value);
+                case CharacterModifierTag.ModifyMaxMana:
+                    maxMana -= value;
+                    currMana *= maxMana / (maxMana + value);
                     break;
-                case CharacterModifierTag.DecreaseMovementSpeed:
+                case CharacterModifierTag.ModifyMovespeed:
                     moveSpeed -= value;
                     break;
-                case CharacterModifierTag.DecreaseNegation:
+                case CharacterModifierTag.ModifyNegation:
                     negation -= value;
                     break;
-                case CharacterModifierTag.DecreasePhysicalResistance:
+                case CharacterModifierTag.ModifyPhysicalResistance:
                     physicalResistance -= value;
                     break;
-                case CharacterModifierTag.ReduceAttackSpeed:
+                case CharacterModifierTag.ModifyAttackSpeed:
                     attackSpeed -= value;
                     break;
                 default:
@@ -85,7 +86,7 @@ namespace AutoChessRPG
         public void MergeOtherStatPacket(StatPacket other)
         {
             maxHealth += other.maxHealth;
-            maxManaPool += other.maxManaPool;
+            maxMana += other.maxMana;
             
             attackDamage += other.attackDamage;
             attackSpeed += other.attackSpeed;
@@ -99,6 +100,25 @@ namespace AutoChessRPG
             debuffResistance += other.debuffResistance;
 
             rotationSpeed = moveSpeed;
+        }
+
+        public override string ToString()
+        {
+            string s = $"STAT PACKET\n" +
+                       $"Max Health => {maxHealth}\n" +
+                       $"Max Mana => {maxMana}\n" +
+                       $"Attack Damage => {attackDamage} HP per attack\n" +
+                       $"Attack Speed => {attackSpeed} attacks per second\n" +
+                       $"Movespeed => {moveSpeed}\n" +
+                       $"Armor => {armor}\n" +
+                       $"Phys Resist => {physicalResistance * 100}%\n" +
+                       $"Negation => {negation}\n" +
+                       $"Mag Resist => {magicResistance * 100}%\n" +
+                       $"Debuff Resist => {debuffResistance * 100}%\n" +
+                       $"Health Regen => {healthRegen} HP per second\n" +
+                       $"Mana Regen => {manaRegen} mana per second\n";
+
+            return s;
         }
         
     }

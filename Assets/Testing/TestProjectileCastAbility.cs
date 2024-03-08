@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.Windows;
 using Input = UnityEngine.Input;
@@ -26,8 +27,8 @@ namespace AutoChessRPG
         public void OnProjectileHit(EncounterAutoCharacterController controller)
         {
             Debug.Log($"Doing stuff to {controller.GetAffiliation()} {controller.GetCharacterData().GetEntityName()}");
-
-            Instantiate(hitEffect, controller.transform.position, Quaternion.identity);
+            
+            // Instantiate(hitEffect, controller.transform.position, Quaternion.identity);
         }
 
         public bool OnLevelUp()

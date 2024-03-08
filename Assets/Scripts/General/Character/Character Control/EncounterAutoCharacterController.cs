@@ -80,16 +80,16 @@ namespace AutoChessRPG
         {
             character = GetComponent<Character>();
             data = character.GetCharacterData();
-            
-            movement = GetComponent<CharacterMovement>();
-            Debug.Log(movement);
-            movement.Initialize(character.GetCharacterStatPacket().moveSpeed, 
-                character.GetCharacterStatPacket().rotationSpeed, 
-                character.GetCharacterData().GetAllowableActionRange());
+
+            character.Initialize();
             
             stats = character.GetCharacterStatPacket();
             preferences = _preferences;
-
+            
+            movement = GetComponent<CharacterMovement>();
+            movement.Initialize(stats, 
+                character.GetCharacterData().GetAllowableActionRange());
+            
             affiliation = _affiliation;
             
             InitialReTargetPreferenceCheck();
@@ -139,17 +139,17 @@ namespace AutoChessRPG
         {
             if (nothingToDo) return;
 
-            if (target is not null) BranchA();
-            else BranchB();
+            if (target is not null) HasTargetBranch();
+            else NoTargetBranch();
         }
 
-        private void BranchA()
+        private void HasTargetBranch()
         {
-            if (queuedAction is not null) BranchC();
-            else BranchD();
+            if (queuedAction is not null) HasActionBranch();
+            else NoActionBranch();
         }
 
-        private void BranchB()
+        private void NoTargetBranch()
         {
             if (targetOverflow) nothingToDo = true;
             else
@@ -159,13 +159,13 @@ namespace AutoChessRPG
             }
         }
 
-        private void BranchC()
+        private void HasActionBranch()
         {
             if (Vector3.Distance(transform.position, target.transform.position) < queuedActionRange) DoAction();
             else MoveToTarget();
         }
 
-        private void BranchD()
+        private void NoActionBranch()
         {
             if (actionOverflow) nothingToDo = true;
             else
@@ -323,7 +323,7 @@ namespace AutoChessRPG
 
         private bool ReTarget()
         {
-            target = EncounterManager.Instance.PerformReTargetAction(this, AffiliationManager.GetOpposingAffiliation(character.GetAffiliation()), target, GetPreferredReTargetMethod());
+            target = EncounterManager.Instance.PerformReTargetAction(this, AffiliationManager.GetOpposingAffiliation(affiliation), target, GetPreferredReTargetMethod());
             
             return true;
         }

@@ -35,12 +35,12 @@ namespace AutoChessRPG
             // Instantiate encounterManagerPrefab as child
             foreach (Character ally in allyCharacters)
             {
-                ally.Initialize(Affiliation.Ally);
+                ally.Initialize();
             }
 
             foreach (Character enemy in enemyCharacters)
             {
-                enemy.Initialize(Affiliation.Enemy);
+                enemy.Initialize();
             }
         }
 
