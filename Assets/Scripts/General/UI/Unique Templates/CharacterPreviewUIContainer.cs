@@ -2,6 +2,8 @@ using System;
 using System.Globalization;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace AutoChessRPG
 {
@@ -11,6 +13,7 @@ namespace AutoChessRPG
         
         [Header("Entity Displays")]
         [SerializeField] private TMP_Text nameText;
+        [SerializeField] private RawImage displayImage;
         
         [Space]
         
@@ -35,11 +38,16 @@ namespace AutoChessRPG
         private StatPacket stats;
         private RealAttributePacket attributes;
 
+        private Camera portraitCam;
+
         public void SendSelectedCharacter(Character character)
         {
             selectedCharacter = character;
             stats = character.GetCharacterStatPacket();
             attributes = character.GetCharacterAttributePacket();
+
+            portraitCam = character.gameObject.GetComponentInChildren<Camera>();
+            displayImage.texture = portraitCam.
             
             UpdateConcreteUIElements();
         }
@@ -65,12 +73,12 @@ namespace AutoChessRPG
             agilityText.text = attributes.Agility().ToString();
             intelligenceText.text = attributes.Intelligence().ToString();
 
-            attackDamageText.text = stats.attackDamage.ToString(CultureInfo.InvariantCulture);
-            attackSpeedText.text = (stats.attackSpeed * StatsParameters.REAL_ATTACK_SPEED_TO_GAME).ToString(CultureInfo.InvariantCulture);
-            moveSpeedText.text = (stats.moveSpeed * StatsParameters.REAL_MOVESPEED_TO_GAME).ToString(CultureInfo.InvariantCulture);
-            armorText.text = stats.armor.ToString(CultureInfo.InvariantCulture);
-            negationText.text = stats.negation.ToString(CultureInfo.InvariantCulture);
-            debuffResistText.text = (stats.debuffResistance * StatsParameters.REAL_PERCENT_TO_GAME).ToString(CultureInfo.InvariantCulture);
+            attackDamageText.text = Mathf.RoundToInt(stats.attackDamage).ToString(CultureInfo.InvariantCulture);
+            attackSpeedText.text = Mathf.RoundToInt(stats.attackSpeed * StatsParameters.REAL_ATTACK_SPEED_TO_GAME).ToString(CultureInfo.InvariantCulture);
+            moveSpeedText.text = Mathf.RoundToInt(stats.moveSpeed * StatsParameters.REAL_MOVESPEED_TO_GAME).ToString(CultureInfo.InvariantCulture);
+            armorText.text = Mathf.RoundToInt(stats.armor).ToString(CultureInfo.InvariantCulture);
+            negationText.text = Mathf.RoundToInt(stats.negation).ToString(CultureInfo.InvariantCulture);
+            debuffResistText.text = Mathf.RoundToInt(stats.debuffResistance * StatsParameters.REAL_PERCENT_TO_GAME).ToString(CultureInfo.InvariantCulture) + "%";
         }
 
     }

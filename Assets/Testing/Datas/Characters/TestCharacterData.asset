@@ -16,12 +16,11 @@ MonoBehaviour:
   entityName: Test Character
   entityDescription: This is a test character (00001)
   entityID: T-00001
+  isHero: 0
   characterRace: 0
   characterAffinities: 00000000
-  characterAttributes:
-    strength: 15
-    agility: 15
-    intelligence: 15
-  movementSpeed: 5
-  rotationSpeed: 5
+  characterBaseAttributes:
+    strength: 127
+    agility: 174
+    intelligence: 251
   allowableActionRange: 90
