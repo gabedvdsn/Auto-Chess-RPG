@@ -1,5 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace AutoChessRPG
@@ -7,14 +11,53 @@ namespace AutoChessRPG
     public class EncounterManager : MonoBehaviour
     {
         public static EncounterManager Instance;
-        
+
+        private Dictionary<Affiliation, List<(EncounterAutoCharacterController, float)>> controllersWaiting;
         private Dictionary<Affiliation, List<EncounterAutoCharacterController>> controllersInEncounter;
+        private int magnitude;
         private EncounterRecordPacket record;
 
-        public void Initialize(Dictionary<Affiliation, List<EncounterAutoCharacterController>> _controllersInEncounter)
+        private bool started;
+        private bool allDeployed;
+        private float encounterTime;
+
+        private float[,] state;
+
+        private const int needSupport = 0;
+        private const int needHealth = 1;
+        private const int needMana = 2;
+        private const int needDebuff = 3;
+
+        public void Initialize(Dictionary<Affiliation, List<(EncounterAutoCharacterController, float)>> controllers)
         {
-            controllersInEncounter = _controllersInEncounter;
-            record = new EncounterRecordPacket(controllersInEncounter);
+            controllersInEncounter = new Dictionary<Affiliation, List<EncounterAutoCharacterController>>();
+            
+            foreach (Affiliation aff in controllers.Keys)
+            {
+                controllersInEncounter[aff] = new List<EncounterAutoCharacterController>();
+                controllersWaiting[aff] = new List<(EncounterAutoCharacterController, float)>();
+
+                foreach ((EncounterAutoCharacterController, float) controller in controllers[aff])
+                {
+                    if (controller.Item2 <= 0)
+                    {
+                        controller.Item1.Initialize(aff, new EncounterPreferencesPacket());
+                        controllersInEncounter[aff].Add(controller.Item1);
+                    }
+                    else
+                    {
+                        controller.Item1.transform.position += new Vector3(0, 100, 0);
+                        controllersWaiting[aff].Add((controller.Item1, controller.Item2));
+                    }
+
+                    magnitude += 1;
+                }
+            }
+            
+            record = new EncounterRecordPacket(controllers);
+
+            state = new float[4, magnitude];
+
         }
 
         public EncounterRecordPacket GetRecordPacket() => record;
@@ -33,9 +76,49 @@ namespace AutoChessRPG
 
         private void Start()
         {
-            throw new NotImplementedException();
+            
         }
-        
+
+        private void Update()
+        {
+            if (started) encounterTime += Time.deltaTime;
+
+            if (allDeployed) return;
+            
+            bool _allDeployed = true;
+                
+            foreach (Affiliation aff in controllersWaiting.Keys)
+            {
+                foreach ((EncounterAutoCharacterController, float) controller in controllersWaiting[aff].Where(controller => controller.Item2 <= encounterTime))
+                {
+                    controllersWaiting[aff].Remove(controller);
+                    DeployController(aff, controller.Item1);
+                            
+                    magnitude += 1;
+                    if (controllersWaiting[aff].Count > 0) _allDeployed = false;
+                }
+            }
+
+            allDeployed = _allDeployed;
+        }
+
+        private void DeployController(Affiliation aff, EncounterAutoCharacterController controller)
+        {
+            StartCoroutine(AerialDeployment(aff, controller))
+        }
+
+        private IEnumerator AerialDeployment(Affiliation aff, EncounterAutoCharacterController controller)
+        {
+            Vector3 placement = controller.transform.position - Vector3.down * 100f;
+            while (Vector3.Distance(controller.transform.position, placement) > 0)
+            {
+                controller.transform.position += Vector3.down * 2.5f;
+                yield return null;
+            }
+            
+            controller.Initialize(aff, new EncounterPreferencesPacket());
+        }
+
         #region Encounter Initialization
         
         public static EncounterPreferencesPacket GetDefaultEncounterPreferencesPacket()
@@ -46,6 +129,43 @@ namespace AutoChessRPG
         #endregion
 
         #region Calculation
+
+        public bool CharacterIsLowHealth(StatPacket stats)
+        {
+            return 0 < stats.currHealth && stats.currHealth <= stats.maxHealth * GameParameters.LOW_HEALTH_UPPER_THRESHOLD;
+        }
+        
+        public bool CharacterIsMediumHealth(StatPacket stats)
+        {
+            return stats.maxHealth * GameParameters.MED_HEALTH_LOWER_THRESHOLD < stats.currHealth && stats.currHealth <= stats.maxHealth * GameParameters.MED_HEALTH_UPPER_THRESHOLD;
+        }
+        
+        public bool CharacterIsHighHealth(StatPacket stats)
+        {
+            return stats.maxHealth * GameParameters.HIGH_HEALTH_LOWER_THRESHOLD < stats.currHealth && stats.currHealth <= stats.maxHealth * GameParameters.HIGH_HEALTH_UPPER_THRESHOLD;
+        }
+
+        public bool AbilityIsMoreOptimalThan(RealAbilityData ability, RealAbilityData selected, EncounterAutoCharacterController target, Character lead = null)
+        {
+            // Optimal abilities are abilities that have the greatest impact
+            
+            // Protecting the Hero
+            if (lead is not null)
+            {
+                
+            }
+
+            // Finishing off an enemy
+
+            // Saving an ally
+
+
+        }
+
+        public void SignalControllerStatus(int category, int self, float value)
+        {
+            state[category, self] = value;
+        }
         
         public float GetAveragePowerFromCharacters(List<Character> characters)
         {
@@ -78,14 +198,14 @@ namespace AutoChessRPG
         
         #endregion
 
-        #region ReTarget
+        /*#region ReTarget
         
         /*
          * ReTarget
          * Find some new target character that is not the current target, unless the current target is the only possible target
          * Requires currTarget: True (can be null)
          * Requires nextAction: False
-         */
+         #1#
         
         private const ReTargetMethod DEFAULT_FALLBACK_RETARGET_METHOD = ReTargetMethod.Closest;
 
@@ -96,7 +216,7 @@ namespace AutoChessRPG
         }
         
         public EncounterAutoCharacterController PerformReTargetAction(EncounterAutoCharacterController self, Affiliation targetAffiliation, EncounterAutoCharacterController currTarget,
-            ReTargetMethod targetMethod, ReTargetMethod secondaryTargetMethod = ReTargetMethod.Closest, bool secondarySearch = false)
+            ReTargetMethod targetMethod, ReTargetMethod secondaryTargetMethod = ReTargetMethod.Closest)
         {
             var result = ReTarget(self, targetAffiliation, currTarget, targetMethod, secondaryTargetMethod);
 
@@ -120,12 +240,17 @@ namespace AutoChessRPG
         }
 
         private (EncounterAutoCharacterController, float) ReTargetClosest(EncounterAutoCharacterController self, Affiliation targetAffiliation, EncounterAutoCharacterController currTarget = null,
-            List<EncounterAutoCharacterController> toCheck = null)
+            List<List<(EncounterAutoCharacterController, float)>> toCheck = null)
         {
             var closest = currTarget;
             float closestDistance = currTarget is null ? 0 : Vector3.Distance(self.transform.position, closest.transform.position);
 
-            foreach (var controller in toCheck ?? controllersInEncounter[targetAffiliation])
+            if (toCheck is null)
+            {
+                return (closest, closestDistance);
+            }
+            
+            foreach (var controller in toCheck != null ? toCheck : controllersInEncounter[targetAffiliation])
             {
                 if (controller == closest) continue;
 
@@ -222,16 +347,16 @@ namespace AutoChessRPG
             // Filter under secondaryMethod using the list of targeting characters
             return ReTarget(self, targetAffiliation, currTarget, secondaryTargetMethod, DEFAULT_FALLBACK_RETARGET_METHOD, possibleControllers);
         }
-        #endregion
+        #endregion*/
     }
 
     public class EncounterRecordPacket
     {
-        public Dictionary<Affiliation, List<EncounterAutoCharacterController>> controllersInEncounter;
+        public Dictionary<Affiliation, List<(EncounterAutoCharacterController, float)>> controllersInEncounter;
         public Dictionary<float, MoveRecordPacket> moveRecord;
         public Dictionary<float, ReTargetRecordPacket> reTargetRecord;
 
-        public EncounterRecordPacket(Dictionary<Affiliation, List<EncounterAutoCharacterController>> _controllersInEncounter)
+        public EncounterRecordPacket(Dictionary<Affiliation, List<(EncounterAutoCharacterController, float)>> _controllersInEncounter)
         {
             controllersInEncounter = _controllersInEncounter;
 

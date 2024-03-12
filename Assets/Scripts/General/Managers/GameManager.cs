@@ -5,15 +5,27 @@ namespace AutoChessRPG
 {
     public class GameManager : MonoBehaviour
     {
+        public static GameManager Instance;
+        public static Character Hero;
+        
         [SerializeField] private GameObject encounterManagerPrefab;
         
-        [SerializeField] private Character[] allyCharacters;
-        [SerializeField] private Character[] enemyCharacters;
-
         private GameMode gamemode;
 
         private bool playerClickToMove;  // player can click on ground to move freely
         private bool playerHasControl;  // player can use items and abilities
+
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(this);
+            }
+            else
+            {
+                Instance = this;
+            }
+        }
 
         private void Update()
         {
@@ -32,16 +44,7 @@ namespace AutoChessRPG
         
         private void OnEnterEncounter()
         {
-            // Instantiate encounterManagerPrefab as child
-            foreach (Character ally in allyCharacters)
-            {
-                ally.Initialize();
-            }
 
-            foreach (Character enemy in enemyCharacters)
-            {
-                enemy.Initialize();
-            }
         }
 
         public void ExitEncounter()
@@ -59,7 +62,7 @@ namespace AutoChessRPG
             
         }
 
-        public void EnterExplorationZone()
+        public void EnterMysteryArea()
         {
             
         }
@@ -89,6 +92,15 @@ namespace AutoChessRPG
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public bool AssignHero(Character hero)
+        {
+            if (Hero != null) return false;
+
+            Hero = hero;
+
+            return true;
         }
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AutoChessRPG.Entity.Character;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,17 +12,22 @@ namespace AutoChessRPG
     {
         // Encounter information
         private Affiliation affiliation;
+        private EncounterAutoCharacterController target;
+
+        private int identifier;
         
         // Individual information
         private Character character;
+
+        private AbilityShelf abilityShelf;
+        private ItemShelf itemShelf;
+        
         private CharacterMovement movement;
 
         private CharacterEntityData data;
         private StatPacket stats;
         private EncounterPreferencesPacket preferences;
-
-        private EncounterAutoCharacterController target;
-
+        
         // Status information
         private bool isDead
         {
@@ -53,30 +59,27 @@ namespace AutoChessRPG
         private QueuedActionDelegate queuedAction;
 
         private float queuedActionRange;
+        private float distanceToTarget;
 
-        private bool nothingToDo;
+        private bool nothingToDo = true;
         private bool actionOverflow;
         private bool targetOverflow;
         
         private bool isTargeted;
 
-        private BaseAbilityData _queuedBaseAbility;
-        private BaseItemData _queuedBaseItem;
+        private RealAbilityData queuedAbility;
+        private RealItemData queuedItem;
         
         // Preferences information
         private ReTargetMethod alwaysReTargetMethod = ReTargetMethod.NONE;
-        
-        private void Awake()
-        {
-            
-        }
 
         private void Update()
         {
-            Move();
+            SendStatus();
+            MainBranch();
         }
 
-        public void Initialize(Affiliation _affiliation, EncounterPreferencesPacket _preferences)
+        public void Initialize(Affiliation _affiliation, EncounterPreferencesPacket _preferences, int _identifier)
         {
             character = GetComponent<Character>();
             data = character.GetCharacterData();
@@ -91,11 +94,26 @@ namespace AutoChessRPG
                 character.GetCharacterData().GetAllowableActionRange());
             
             affiliation = _affiliation;
+
+            abilityShelf = character.GetCharacterAbilityShelf();
+            itemShelf = character.GetCharacterItemShelf();
             
             InitialReTargetPreferenceCheck();
+
+            nothingToDo = false;
+
+            identifier = _identifier;
         }
         
         #region Statuses
+
+        public void SendStatus()
+        {
+            float health = 1 - stats.currHealth / stats.maxHealth;
+            float mana = 1 - stats.currMana / stats.maxMana;
+            float support = (isTargeted ? 1 : 0) * ((health + mana) / 2);
+            
+        }
 
         public void SetPrimaryStatus(bool status) => canAct = status;
 
@@ -143,13 +161,13 @@ namespace AutoChessRPG
             else NoTargetBranch();
         }
 
-        private void HasTargetBranch()
+        private void HasTargetBranch()  // A
         {
             if (queuedAction is not null) HasActionBranch();
             else NoActionBranch();
         }
 
-        private void NoTargetBranch()
+        private void NoTargetBranch()  // B
         {
             if (targetOverflow) nothingToDo = true;
             else
@@ -159,13 +177,14 @@ namespace AutoChessRPG
             }
         }
 
-        private void HasActionBranch()
+        private void HasActionBranch()  // C
         {
-            if (Vector3.Distance(transform.position, target.transform.position) < queuedActionRange) DoAction();
+            distanceToTarget = Vector3.Distance(transform.position, target.transform.position);
+            if (distanceToTarget < queuedActionRange) DoAction();
             else MoveToTarget();
         }
 
-        private void NoActionBranch()
+        private void NoActionBranch()  // D
         {
             if (actionOverflow) nothingToDo = true;
             else
@@ -202,22 +221,82 @@ namespace AutoChessRPG
             
             if (target is null) return;
 
-            // 
+            // Get cast ability
+            if (QueueCastAbility()) return;
+
+            // All abilities attached to items are put into the abilityShelf at initialization
+
+            // attack
+            if (QueueAttack()) return;
         }
 
-        private BaseAbilityData QueueCastAbility()
+        private bool QueueCastAbility()
         {
-            return default;
+            RealAbilityData optimalAbility = null;
+            CastUsagePreference leadingPref = CastUsagePreference.NONE;
+            
+            foreach (RealAbilityData ability in abilityShelf.GetShelf())
+            {
+                if (!abilityShelf.AbilityIsOffCooldown(ability)) continue;
+                
+                optimalAbility = GetPreferableAbility(ability, optimalAbility, leadingPref);
+                leadingPref = preferences.GetAbilityUsagePreference(optimalAbility);
+            }
+
+            if (optimalAbility is null) return false;
+            
+            queuedActionRange = optimalAbility.GetBaseData().GetRange();
+            queuedAction = CastAbility;
+
+            return true;
+
         }
 
-        private BaseItemData QueueCastItem()
+        private RealAbilityData GetPreferableAbility(RealAbilityData ability, RealAbilityData selected, CastUsagePreference sPref)
         {
-            return default;
+            if (selected is null) return ability;
+
+            switch (sPref)
+            {
+                case CastUsagePreference.NONE:
+                    return ability;
+                case CastUsagePreference.Immediately:
+                    return selected;
+            }
+
+            CastUsagePreference aPref = preferences.GetAbilityUsagePreference(ability);
+            
+            switch (aPref)
+            {
+                case CastUsagePreference.Immediately:
+                    return ability;
+                case CastUsagePreference.Optimal when EncounterManager.Instance.AbilityIsMoreOptimalThan(ability, selected, target):
+                    return ability;
+                case CastUsagePreference.SelfLowHealth when EncounterManager.Instance.CharacterIsLowHealth(stats):
+                    return ability;
+                case CastUsagePreference.SelfMediumHealth when EncounterManager.Instance.CharacterIsMediumHealth(stats):
+                    return ability;
+                case CastUsagePreference.SelfHighHealth when EncounterManager.Instance.CharacterIsHighHealth(stats):
+                    return ability;
+                case CastUsagePreference.TargetLowHealth when EncounterManager.Instance.CharacterIsLowHealth(target.GetCharacterStatPacket()):
+                    return ability;
+                case CastUsagePreference.TargetMediumHealth when EncounterManager.Instance.CharacterIsMediumHealth(target.GetCharacterStatPacket()):
+                    return ability;
+                case CastUsagePreference.TargetHighHealth when EncounterManager.Instance.CharacterIsHighHealth(target.GetCharacterStatPacket()):
+                    return ability;
+                case CastUsagePreference.NONE:
+                    return ability;
+                default:
+                    return selected;
+            }
         }
 
         private bool QueueAttack()
         {
-            return default;
+            queuedActionRange = character.GetCharacterData().GetAttackRange();
+            queuedAction = Attack;
+
+            return true;
         }
         
         #endregion
@@ -323,7 +402,7 @@ namespace AutoChessRPG
 
         private bool ReTarget()
         {
-            target = EncounterManager.Instance.PerformReTargetAction(this, AffiliationManager.GetOpposingAffiliation(affiliation), target, GetPreferredReTargetMethod());
+            // target = EncounterManager.Instance.PerformReTargetAction(this, AffiliationManager.GetOpposingAffiliation(affiliation), target, GetPreferredReTargetMethod());
             
             return true;
         }
@@ -361,14 +440,20 @@ namespace AutoChessRPG
         Always,
         HighHealth,
         MediumHealth,
-        LowHealth
+        LowHealth,
+        NONE
     }
 
     public enum CastUsagePreference
     {
         Optimal,
         Immediately,
-        LowHealth,
-        MediumHealth
+        SelfLowHealth,
+        SelfMediumHealth,
+        SelfHighHealth,
+        TargetLowHealth,
+        TargetMediumHealth,
+        TargetHighHealth,
+        NONE
     }
 }

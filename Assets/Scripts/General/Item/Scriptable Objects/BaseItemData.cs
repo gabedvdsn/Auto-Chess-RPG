@@ -50,7 +50,9 @@ namespace AutoChessRPG
         private RealAttributePacket _attachedBaseAttributes;
         private StatPacket attachedStats;
 
-        public RealItemData(BaseItemData _baseData, RealPowerPacket _power, RealAbilityData[] _attachedAbilities, RealAttributePacket attachedBaseAttributes, StatPacket _attachedStats)
+        
+
+        public RealItemData(BaseItemData _baseData, RealPowerPacket _power, RealAbilityData[] _attachedAbilities, RealAttributePacket attachedBaseAttributes, StatPacket _attachedStats, RealItemData _attachedItem = null)
         {
             baseData = _baseData;
             power = _power;
@@ -88,5 +90,6 @@ namespace AutoChessRPG
         public RealPowerPacket GetPowerPacket() => power;
 
         public BasePowerPacket GetBasePowerPacket() => baseData.GetPowerPacket();
+        
     }
 }

@@ -46,9 +46,8 @@ namespace AutoChessRPG
             stats = character.GetCharacterStatPacket();
             attributes = character.GetCharacterAttributePacket();
 
-            portraitCam = character.gameObject.GetComponentInChildren<Camera>();
-            displayImage.texture = portraitCam.
-            
+            // portraitCam = character.gameObject.GetComponentInChildren<Camera>();
+
             UpdateConcreteUIElements();
         }
 

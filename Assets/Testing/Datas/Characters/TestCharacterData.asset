@@ -20,7 +20,7 @@ MonoBehaviour:
   characterRace: 0
   characterAffinities: 00000000
   characterBaseAttributes:
-    strength: 127
-    agility: 174
-    intelligence: 251
+    strength: 20
+    agility: 20
+    intelligence: 20
   allowableActionRange: 90

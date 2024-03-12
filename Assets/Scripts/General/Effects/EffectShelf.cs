@@ -2,6 +2,7 @@ using System;
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using AutoChessRPG.Entity;
 using AutoChessRPG.Entity.Character;
@@ -13,15 +14,17 @@ namespace AutoChessRPG
     public class EffectShelf : ObservableSubject
     {
         private Character owner;
-        private Dictionary<BaseEffectData, EffectRecord> shelf;
+        private Dictionary<RealEffectData, EffectRecord> shelf;
         private List<EffectRecord> records;
 
         private bool doDispell;
-        private List<BaseEffectData> dispellQueue;
+        private List<RealEffectData> dispellQueue;
+
+        private int dispellValue;
 
         private void Start()
         {
-            shelf = new Dictionary<BaseEffectData, EffectRecord>();
+            shelf = new Dictionary<RealEffectData, EffectRecord>();
         }
 
         private void Update()
@@ -35,46 +38,48 @@ namespace AutoChessRPG
 
         private void TickEffects()
         {
-            foreach (BaseEffectData effect in shelf.Keys.Where(effect => shelf[effect].GetResultOfTick() && !effect.GetApplyOnce()))
+            foreach (RealEffectData effect in shelf.Keys.Where(effect => shelf[effect].GetResultOfTick() && !effect.GetBaseData().GetApplyOnce()))
             {
                 ApplyEffect(effect);
             }
         }
 
-        private void ApplyConstantEffect(BaseEffectData baseEffect)
+        private void ApplyConstantEffect(RealEffectData effect)
         {
-            if (baseEffect.GetApplyOnce()) ApplyEffect(baseEffect);
+            if (effect.GetBaseData().GetApplyOnce()) ApplyEffect(effect);
         }
 
-        private void ApplyEffect(BaseEffectData baseEffect)
+        private void ApplyEffect(RealEffectData baseEffect)
         {
-            owner.ApplyModifierToStats(baseEffect.GetModifier(), baseEffect.GetEffectAmount());
+            owner.ApplyModifierToStats(baseEffect.GetBaseData().GetModifier(), baseEffect.GetAmount());
         }
         
-        public bool AddEffect(ICharacterEntity source, BaseEffectData baseEffect)
+        public bool AttachEffect(ICharacterEntity source, RealEffectData effect)
         {
-            shelf[baseEffect] = new EffectRecord(source, owner, baseEffect, Time.time);
+            shelf[effect] = new EffectRecord(source, owner, effect, Time.time);
             
-            ApplyConstantEffect(baseEffect);
+            ApplyConstantEffect(effect);
+
+            dispellValue += (int)effect.GetBaseData().GetDispellRequirement();
 
             return true;
         }
 
-        public bool RemoveEffect(BaseEffectData baseEffect)
+        public bool RemoveEffect(RealEffectData effect)
         {
-            EffectRecord record = shelf[baseEffect];
+            EffectRecord record = shelf[effect];
 
             records.Add(record);
-            shelf.Remove(baseEffect);
+            shelf.Remove(effect);
 
-            if (baseEffect.GetReverseEffectsAtTermination()) owner.ApplyModifierToStats(baseEffect.GetModifier(), -record.statDelta);
+            if (effect.GetBaseData().GetReverseEffectsAtTermination()) owner.ApplyModifierToStats(effect.GetBaseData().GetModifier(), -record.statDelta);
 
             return true;
         }
 
         public void ApplyDispell(Dispell dispell)
         {
-            foreach (BaseEffectData effect in shelf.Keys.Where(effect => DispellManager.DispellIsEffective(dispell, effect.GetDispellRequirement())))
+            foreach (RealEffectData effect in shelf.Keys.Where(effect => DispellManager.DispellIsEffective(dispell, effect.GetBaseData().GetDispellRequirement())))
             {
                 dispellQueue.Add(effect);
                 doDispell = true;
@@ -83,7 +88,7 @@ namespace AutoChessRPG
 
         private bool EmptyDispellQueue()
         {
-            foreach (BaseEffectData effect in dispellQueue)
+            foreach (RealEffectData effect in dispellQueue)
             {
                 RemoveEffect(effect);
             }
@@ -102,13 +107,15 @@ namespace AutoChessRPG
             
             return recordsCopy;
         }
+
+        public int GetDispellValue() => dispellValue;
     }
 
     public struct EffectRecord : IObservableData
     {
         public ICharacterEntity target;
         public ICharacterEntity source;
-        public BaseEffectData data;  // the source baseEffect
+        public RealEffectData data;  // the source effect
         
         public float timeInitial;
         public float timeRemaining;
@@ -117,7 +124,7 @@ namespace AutoChessRPG
 
         public float statDelta;
                                     
-        public EffectRecord(ICharacterEntity _source, ICharacterEntity _target, BaseEffectData data, float _timeInitial)
+        public EffectRecord(ICharacterEntity _source, ICharacterEntity _target, RealEffectData data, float _timeInitial)
         {
             source = _source;
             target = _target;
@@ -153,10 +160,10 @@ namespace AutoChessRPG
             {
                 {ObservableDataFormatting.ACTION_SOURCE_CHARACTER, source.GetBaseData().GetEntityName()},
                 {ObservableDataFormatting.ACTION_TARGET_CHARACTER, target.GetBaseData().GetEntityName()},
-                {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_SOURCE, data.GetEntityName()},
-                {ObservableDataFormatting.ACTION_TIME_INITIAL, timeInitial.ToString()},
-                {ObservableDataFormatting.ACTION_TIME_FINAL, (timeInitial + (data.GetDuration() - timeRemaining)).ToString()},
-                {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_MODIFIER, data.GetModifier().ToString()}
+                {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_SOURCE, data.GetBaseData().GetEntityName()},
+                {ObservableDataFormatting.ACTION_TIME_INITIAL, timeInitial.ToString(CultureInfo.InvariantCulture)},
+                {ObservableDataFormatting.ACTION_TIME_FINAL, (timeInitial + (data.GetDuration() - timeRemaining)).ToString(CultureInfo.InvariantCulture)},
+                {ObservableDataFormatting.IMPACT_CHARACTER_EFFECT_MODIFIER, data.GetBaseData().GetModifier().ToString()}
             };
         }
     }

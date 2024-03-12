@@ -15,6 +15,7 @@ namespace AutoChessRPG
         [SerializeField] protected AbilityActivation activation;
         [SerializeField] protected BasePowerPacket powerPacket;
         [SerializeField] protected BaseEffectData[] effectsOfAbility;
+        [SerializeField] protected float range;
 
         // Base Ability Information Getters
         public Affiliation GetTargetableAffiliation() => canTarget;
@@ -24,6 +25,8 @@ namespace AutoChessRPG
         public BasePowerPacket GetPowerPacket() => powerPacket;
         
         public BaseEffectData[] GetEffects() => effectsOfAbility;
+
+        public float GetRange() => range;
     }
 
     public class RealAbilityData
@@ -31,11 +34,15 @@ namespace AutoChessRPG
         private BaseAbilityData baseData;
 
         private RealPowerPacket power;
+        
+        private RealItemData attachedItem;
 
-        public RealAbilityData(BaseAbilityData _baseData, RealPowerPacket _power)
+        public RealAbilityData(BaseAbilityData _baseData, RealPowerPacket _power, RealItemData _attachedItem = null)
         {
             baseData = _baseData;
             power = _power;
+
+            attachedItem = _attachedItem;
         }
 
         public virtual bool LevelUp() => power.LevelUp();
@@ -45,5 +52,10 @@ namespace AutoChessRPG
         public RealPowerPacket GetPowerPacket() => power;
 
         public BasePowerPacket GetBasePowerPacket() => baseData.GetPowerPacket();
+
+        public void SetIsAttachedToItem(RealItemData item) => attachedItem = item;
+        public bool IsAttachedToItem() => attachedItem is not null;
+
+        public RealItemData GetAttachmentItem() => attachedItem;
     }
 }

@@ -53,14 +53,25 @@ namespace AutoChessRPG
     public class RealEffectData
     {
         private BaseEffectData baseData;
-        
+
+        public float tickRate;
         private float effectDuration;
         private float effectAmount;
 
-        public BaseEffectData GetBaseEffectData() => baseData;
+        public RealEffectData(BaseEffectData _baseData, float _tickRate, float _effectDuration, float _effectAmount)
+        {
+            baseData = _baseData;
+            tickRate = _tickRate;
+            effectDuration = _effectDuration;
+            effectAmount = _effectAmount;
+        }
 
-        public float GetEffectDuration() => effectDuration;
+        public BaseEffectData GetBaseData() => baseData;
 
-        public float GetEffectAmount() => effectAmount;
+        public float GetTickRate() => tickRate;
+
+        public float GetDuration() => effectDuration;
+
+        public float GetAmount() => effectAmount;
     }
 }

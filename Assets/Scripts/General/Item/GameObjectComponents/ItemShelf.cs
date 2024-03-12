@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using AutoChessRPG.Entity.Character;
 using UnityEngine;
 
@@ -6,21 +7,21 @@ namespace AutoChessRPG
 {
     public class ItemShelf : ObservableSubject
     {
-        private Dictionary<BaseItemData, float> shelf;
+        private Dictionary<RealItemData, float> shelf;
         private List<ItemRecord> records;
 
-        public bool PassItemsOnInstantiation(BaseItemData[] items)
+        public bool PassItemsOnInstantiation(RealItemData[] items)
         {
             if (shelf is not null) return false;
 
-            shelf = new Dictionary<BaseItemData, float>();
+            shelf = new Dictionary<RealItemData, float>();
 
-            foreach (BaseItemData item in items) shelf[item] = 0f;
+            foreach (RealItemData item in items) shelf[item] = 0f;
 
             return true;
         }
 
-        public bool OnUseItem(BaseItemData baseItem)
+        public bool OnUseItem(RealItemData baseItem)
         {
             if (baseItem.GetAttachedAbilities().Length > 0)
             {
@@ -30,7 +31,9 @@ namespace AutoChessRPG
             return true;
         }
 
-        private bool ItemIsOffCooldown(BaseItemData ability) => shelf[ability] <= 0f;
+        public bool ItemIsOffCooldown(RealItemData ability) => shelf[ability] <= 0f;
+
+        public RealItemData[] GetShelf() => shelf.Keys.ToArray();
     }
 
     public struct ItemRecord : IObservableData

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AutoChessRPG
 {
-    public enum Race
+    public enum Species
     {
         Human,
         Elf,

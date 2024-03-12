@@ -69,9 +69,9 @@ namespace AutoChessRPG
         
         #region Effects
 
-        public bool AttachEffect(ICharacterEntity source, BaseEffectData baseEffect) => effectShelf.AddEffect(source, baseEffect);
+        public bool AttachEffect(ICharacterEntity source, RealEffectData effect) => effectShelf.AttachEffect(source, effect);
 
-        public bool RemoveEffect(BaseEffectData baseEffect) => effectShelf.RemoveEffect(baseEffect);
+        public bool RemoveEffect(RealEffectData effect) => effectShelf.RemoveEffect(effect);
         
         #endregion
         

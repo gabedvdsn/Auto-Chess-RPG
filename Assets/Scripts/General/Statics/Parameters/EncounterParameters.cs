@@ -9,18 +9,18 @@ namespace AutoChessRPG
             { ReTargetPreference.Optimal , ReTargetMethod.NONE }
         };
 
-        private static Dictionary<BaseAbilityData, CastUsagePreference> DEFAULT_ABILITY_USAGE_PREFERENCES = new Dictionary<BaseAbilityData, CastUsagePreference>()
+        private static Dictionary<RealAbilityData, CastUsagePreference> DEFAULT_ABILITY_USAGE_PREFERENCES = new Dictionary<RealAbilityData, CastUsagePreference>()
         {
             
         };
         
-        private static Dictionary<BaseItemData, CastUsagePreference> DEFAULT_ITEM_USAGE_PREFERENCES = new Dictionary<BaseItemData, CastUsagePreference>()
+        private static Dictionary<RealItemData, CastUsagePreference> DEFAULT_ITEM_USAGE_PREFERENCES = new Dictionary<RealItemData, CastUsagePreference>()
         {
             
         };
 
         public static Dictionary<ReTargetPreference, ReTargetMethod> GetDefaultReTargetPreferences() => DEFAULT_RETARGET_PREFERENCES;
-        public static Dictionary<BaseAbilityData, CastUsagePreference> GetDefaultAbilityUsagePreferences() => DEFAULT_ABILITY_USAGE_PREFERENCES;
-        public static Dictionary<BaseItemData, CastUsagePreference> GetDefaultItemUsagePreferences() => DEFAULT_ITEM_USAGE_PREFERENCES;
+        public static Dictionary<RealAbilityData, CastUsagePreference> GetDefaultAbilityUsagePreferences() => DEFAULT_ABILITY_USAGE_PREFERENCES;
+        public static Dictionary<RealItemData, CastUsagePreference> GetDefaultItemUsagePreferences() => DEFAULT_ITEM_USAGE_PREFERENCES;
     }
 }

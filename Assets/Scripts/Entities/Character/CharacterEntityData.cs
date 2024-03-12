@@ -12,12 +12,13 @@ namespace AutoChessRPG
     {
         [Header("Character Information")]
         [SerializeField] private bool isHero;
-        [SerializeField] private Race characterRace;
+        [SerializeField] private Species characterSpecies;
         [SerializeField] private Affinity[] characterAffinities;
-        [FormerlySerializedAs("characterAttributes")] [SerializeField] private BaseAttributePacket characterBaseAttributes;
+        [SerializeField] private BaseAttributePacket characterBaseAttributes;
 
         [Header("Physical Information")] 
         [SerializeField] [Range(0, 90f)] private float allowableActionRange = 90f;
+        [SerializeField] private float attackRange;
 
         private void OnValidate()
         {
@@ -26,13 +27,15 @@ namespace AutoChessRPG
 
         public bool GetIsHero() => isHero;
         
-        public Race GetCharacterRace() => characterRace;
+        public Species GetCharacterRace() => characterSpecies;
 
         public Affinity[] GetCharacterAffinities() => characterAffinities;
         
         public BaseAttributePacket GetAttributes() => characterBaseAttributes;
 
         public float GetAllowableActionRange() => allowableActionRange;
+
+        public float GetAttackRange() => attackRange;
     }
 
     [Serializable]
