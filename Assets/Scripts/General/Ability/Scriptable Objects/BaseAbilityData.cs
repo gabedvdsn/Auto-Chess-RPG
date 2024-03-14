@@ -37,6 +37,8 @@ namespace AutoChessRPG
         
         private RealItemData attachedItem;
 
+        private RealEffectData[] effectsOfAbility;
+
         public RealAbilityData(BaseAbilityData _baseData, RealPowerPacket _power, RealItemData _attachedItem = null)
         {
             baseData = _baseData;
@@ -52,6 +54,8 @@ namespace AutoChessRPG
         public RealPowerPacket GetPowerPacket() => power;
 
         public BasePowerPacket GetBasePowerPacket() => baseData.GetPowerPacket();
+
+        public RealEffectData[] GetEffects() => effectsOfAbility;
 
         public void SetIsAttachedToItem(RealItemData item) => attachedItem = item;
         public bool IsAttachedToItem() => attachedItem is not null;

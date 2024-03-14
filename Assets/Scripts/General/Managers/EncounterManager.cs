@@ -12,7 +12,7 @@ namespace AutoChessRPG
     {
         public static EncounterManager Instance;
 
-        private Dictionary<Affiliation, List<(EncounterAutoCharacterController, float)>> controllersWaiting;
+        private Dictionary<Affiliation, List<(EncounterAutoCharacterController, float, int)>> controllersWaiting;
         private Dictionary<Affiliation, List<EncounterAutoCharacterController>> controllersInEncounter;
         private int magnitude;
         private EncounterRecordPacket record;
@@ -35,19 +35,19 @@ namespace AutoChessRPG
             foreach (Affiliation aff in controllers.Keys)
             {
                 controllersInEncounter[aff] = new List<EncounterAutoCharacterController>();
-                controllersWaiting[aff] = new List<(EncounterAutoCharacterController, float)>();
+                controllersWaiting[aff] = new List<(EncounterAutoCharacterController, float, int)>();
 
                 foreach ((EncounterAutoCharacterController, float) controller in controllers[aff])
                 {
                     if (controller.Item2 <= 0)
                     {
-                        controller.Item1.Initialize(aff, new EncounterPreferencesPacket());
+                        controller.Item1.Initialize(aff, new EncounterPreferencesPacket(), magnitude);
                         controllersInEncounter[aff].Add(controller.Item1);
                     }
                     else
                     {
                         controller.Item1.transform.position += new Vector3(0, 100, 0);
-                        controllersWaiting[aff].Add((controller.Item1, controller.Item2));
+                        controllersWaiting[aff].Add((controller.Item1, controller.Item2, magnitude));
                     }
 
                     magnitude += 1;
@@ -89,10 +89,10 @@ namespace AutoChessRPG
                 
             foreach (Affiliation aff in controllersWaiting.Keys)
             {
-                foreach ((EncounterAutoCharacterController, float) controller in controllersWaiting[aff].Where(controller => controller.Item2 <= encounterTime))
+                foreach ((EncounterAutoCharacterController, float, int) controller in controllersWaiting[aff].Where(controller => controller.Item2 <= encounterTime))
                 {
                     controllersWaiting[aff].Remove(controller);
-                    DeployController(aff, controller.Item1);
+                    DeployController(aff, controller.Item1, controller.Item3);
                             
                     magnitude += 1;
                     if (controllersWaiting[aff].Count > 0) _allDeployed = false;
@@ -102,12 +102,12 @@ namespace AutoChessRPG
             allDeployed = _allDeployed;
         }
 
-        private void DeployController(Affiliation aff, EncounterAutoCharacterController controller)
+        private void DeployController(Affiliation aff, EncounterAutoCharacterController controller, int identifier)
         {
-            StartCoroutine(AerialDeployment(aff, controller))
+            StartCoroutine(AerialDeployment(aff, controller, identifier));
         }
 
-        private IEnumerator AerialDeployment(Affiliation aff, EncounterAutoCharacterController controller)
+        private IEnumerator AerialDeployment(Affiliation aff, EncounterAutoCharacterController controller, int identifier)
         {
             Vector3 placement = controller.transform.position - Vector3.down * 100f;
             while (Vector3.Distance(controller.transform.position, placement) > 0)
@@ -116,7 +116,7 @@ namespace AutoChessRPG
                 yield return null;
             }
             
-            controller.Initialize(aff, new EncounterPreferencesPacket());
+            controller.Initialize(aff, new EncounterPreferencesPacket(), identifier);
         }
 
         #region Encounter Initialization
@@ -159,6 +159,7 @@ namespace AutoChessRPG
 
             // Saving an ally
 
+            return false;
 
         }
 

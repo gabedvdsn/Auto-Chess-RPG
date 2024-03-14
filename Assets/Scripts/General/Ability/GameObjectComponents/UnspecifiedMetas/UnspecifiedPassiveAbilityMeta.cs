@@ -3,14 +3,13 @@ using UnityEngine;
 
 namespace AutoChessRPG
 {
-    public class UnspecifiedPassiveAbilityMeta : MonoBehaviour, IPassiveAbilityMeta
+    public class UnspecifiedPassiveAbilityMeta : UnspecifiedAbilityMeta, IPassiveAbilityMeta
     {
-        [SerializeField] private ICharacterEntity owner;
-        [SerializeField] private BaseAbilityData data;
+        [SerializeField] private RealAbilityData data;
         
         public bool OnAttachPassive()
         {
-            foreach (BaseEffectData effect in data.GetEffects()) owner.AttachEffect(owner, effect);
+            foreach (RealEffectData effect in data.GetEffects()) owner.AttachEffect(owner, effect);
 
             return true;
         }
@@ -22,7 +21,7 @@ namespace AutoChessRPG
 
         public bool OnRemovePassive()
         {
-            foreach (BaseEffectData effect in data.GetEffects()) owner.RemoveEffect(effect);
+            foreach (RealEffectData effect in data.GetEffects()) owner.RemoveEffect(effect);
 
             return true;
         }

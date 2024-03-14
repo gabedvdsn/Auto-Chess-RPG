@@ -37,10 +37,12 @@ public class TestSceneControllersWithoutManagers : MonoBehaviour
         
         foreach (Affiliation affiliation in controllersByAffiliation.Keys)
         {
-            foreach (GameObject go in controllersByAffiliation[affiliation])
+            for (int i = 0; i < controllersByAffiliation[affiliation].Length; i++)
             {
+                GameObject go = controllersByAffiliation[affiliation][i];
+                
                 EncounterAutoCharacterController controller = go.GetComponent<EncounterAutoCharacterController>();
-                controller.Initialize(affiliation, new EncounterPreferencesPacket());
+                controller.Initialize(affiliation, new EncounterPreferencesPacket(), i);
 
                 go.GetComponent<MeshRenderer>().material = materialsByAffiliation[affiliation];
                 
