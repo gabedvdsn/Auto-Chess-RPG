@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace AutoChessRPG.Rotation_Behaviours
 {
-    public class BRotateAroundTarget : BTargeted
+    public class BRotateAroundTarget : BUnitTargeted
     {
         private float speed;
         

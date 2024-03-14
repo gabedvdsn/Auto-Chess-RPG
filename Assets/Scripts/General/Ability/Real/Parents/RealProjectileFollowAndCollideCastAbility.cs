@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AutoChessRPG
 {
-    public class RealProjectileCastAbility : UnspecifiedCastAbilityMeta
+    public class RealProjectileFollowAndCollideCastAbility : UnspecifiedCastAbilityMeta
     {
         // This ability will cast a projectile
         [SerializeField] protected GameObject projectilePrefab;

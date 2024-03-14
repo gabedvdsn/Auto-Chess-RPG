@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace AutoChessRPG
 {
-    public class BFollowTarget : BTargeted
+    public class BFollowTarget : BUnitTargeted
     {
         private float speed;
         private Vector3 direction;
@@ -33,7 +33,7 @@ namespace AutoChessRPG
         {
             direction = (target.position - transform.position).normalized;
             
-            rb.velocity = direction * speed;
+            rb.velocity = direction * (speed * Time.deltaTime);
         }
     }
 }

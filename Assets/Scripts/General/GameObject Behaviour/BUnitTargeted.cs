@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace AutoChessRPG
 {
-    public class BTargeted : GameObjectBehaviour
+    public class BUnitTargeted : BLifeTime
     {
         protected GameObject targetGO;
         protected Transform target;
@@ -12,7 +12,7 @@ namespace AutoChessRPG
             targetGO = _targetGO;
             target = targetGO.transform;
 
-            initialized = true;
+            base.Initialize();
         }
     }
 }

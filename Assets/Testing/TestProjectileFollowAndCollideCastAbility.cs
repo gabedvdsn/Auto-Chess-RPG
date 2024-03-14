@@ -6,7 +6,7 @@ using Input = UnityEngine.Input;
 
 namespace AutoChessRPG
 {
-    public class TestProjectileCastAbility : RealProjectileCastAbility, IRealProjectile
+    public class TestProjectileFollowAndCollideCastAbility : RealProjectileFollowAndCollideCastAbility, IRealProjectile
     {
         [SerializeField] private GameObject target;
         [SerializeField] private GameObject hitEffect;

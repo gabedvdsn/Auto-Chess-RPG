@@ -5,8 +5,6 @@ namespace AutoChessRPG
 {
     public class UnspecifiedAbilityMeta : ObservableSubject
     {
-        [SerializeField] protected BaseAbilityData baseData;
-
         protected ICharacterEntity owner;
         
         protected bool attemptingToCast;

@@ -13,9 +13,14 @@ namespace AutoChessRPG
             rb = GetComponent<Rigidbody>();
         }
 
+        protected void Initialize()
+        {
+            initialized = true;
+        }
+
         public void ThisDestroy()
         {
-            Debug.Log($"Destroying projectile {gameObject}");
+            Debug.Log($"Destroying gameobject {gameObject}");
             Destroy(gameObject);
         }
         

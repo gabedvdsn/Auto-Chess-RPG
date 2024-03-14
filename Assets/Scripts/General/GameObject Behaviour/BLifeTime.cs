@@ -7,6 +7,11 @@ namespace AutoChessRPG
     {
         [SerializeField] private float lifetime;
 
+        protected new void Initialize()
+        {
+            base.Initialize();
+        }
+
         private void Start()
         {
             Destroy(gameObject, lifetime);

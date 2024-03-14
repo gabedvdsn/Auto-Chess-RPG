@@ -5,7 +5,7 @@ namespace AutoChessRPG
 {
     public class UnspecifiedPassiveAbilityMeta : UnspecifiedAbilityMeta, IPassiveAbilityMeta
     {
-        [SerializeField] private RealAbilityData data;
+        private RealAbilityData data;
         
         public bool OnAttachPassive()
         {
