@@ -21,17 +21,16 @@ namespace AutoChessRPG
             return true;
         }
 
-        public bool OnUseItem(RealItemData baseItem)
+        public bool OnUseItem(RealItemData item)
         {
-            if (baseItem.GetAttachedAbilities().Length > 0)
-            {
-                
-            }
+            if (!ItemIsOffCooldown(item)) return false;
+            
+            shelf[item] = item.
 
             return true;
         }
 
-        public bool ItemIsOffCooldown(RealItemData ability) => shelf[ability] <= 0f;
+        public bool ItemIsOffCooldown(RealItemData item) => shelf[item] <= 0f && item.GetCooldown() >= 0;
 
         public RealItemData[] GetShelf() => shelf.Keys.ToArray();
     }

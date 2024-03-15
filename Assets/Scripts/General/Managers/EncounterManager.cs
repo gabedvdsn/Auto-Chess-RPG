@@ -12,52 +12,29 @@ namespace AutoChessRPG
     {
         public static EncounterManager Instance;
 
-        private Dictionary<Affiliation, List<(EncounterAutoCharacterController, float, int)>> controllersWaiting;
         private Dictionary<Affiliation, List<EncounterAutoCharacterController>> controllersInEncounter;
-        private int magnitude;
+        private int controllersActive;
         private EncounterRecordPacket record;
 
         private bool started;
         private bool allDeployed;
         private float encounterTime;
 
-        private float[,] state;
-
-        private const int needSupport = 0;
-        private const int needHealth = 1;
-        private const int needMana = 2;
-        private const int needDebuff = 3;
-
-        public void Initialize(Dictionary<Affiliation, List<(EncounterAutoCharacterController, float)>> controllers)
+        public void Initialize(Dictionary<Affiliation, List<EncounterAutoCharacterController>> controllers)
         {
-            controllersInEncounter = new Dictionary<Affiliation, List<EncounterAutoCharacterController>>();
+            controllersInEncounter = controllers;
             
             foreach (Affiliation aff in controllers.Keys)
             {
-                controllersInEncounter[aff] = new List<EncounterAutoCharacterController>();
-                controllersWaiting[aff] = new List<(EncounterAutoCharacterController, float, int)>();
+                controllersActive += controllers[aff].Count;
 
-                foreach ((EncounterAutoCharacterController, float) controller in controllers[aff])
+                foreach (EncounterAutoCharacterController controller in controllers[aff])
                 {
-                    if (controller.Item2 <= 0)
-                    {
-                        controller.Item1.Initialize(aff, new EncounterPreferencesPacket(), magnitude);
-                        controllersInEncounter[aff].Add(controller.Item1);
-                    }
-                    else
-                    {
-                        controller.Item1.transform.position += new Vector3(0, 100, 0);
-                        controllersWaiting[aff].Add((controller.Item1, controller.Item2, magnitude));
-                    }
-
-                    magnitude += 1;
+                    controller.Initialize(aff);
                 }
             }
             
             record = new EncounterRecordPacket(controllers);
-
-            state = new float[4, magnitude];
-
         }
 
         public EncounterRecordPacket GetRecordPacket() => record;
@@ -82,41 +59,13 @@ namespace AutoChessRPG
         private void Update()
         {
             if (started) encounterTime += Time.deltaTime;
-
-            if (allDeployed) return;
-            
-            bool _allDeployed = true;
-                
-            foreach (Affiliation aff in controllersWaiting.Keys)
-            {
-                foreach ((EncounterAutoCharacterController, float, int) controller in controllersWaiting[aff].Where(controller => controller.Item2 <= encounterTime))
-                {
-                    controllersWaiting[aff].Remove(controller);
-                    DeployController(aff, controller.Item1, controller.Item3);
-                            
-                    magnitude += 1;
-                    if (controllersWaiting[aff].Count > 0) _allDeployed = false;
-                }
-            }
-
-            allDeployed = _allDeployed;
         }
 
-        private void DeployController(Affiliation aff, EncounterAutoCharacterController controller, int identifier)
+        private void AddControllerToEncounter(Affiliation aff, EncounterAutoCharacterController controller)
         {
-            StartCoroutine(AerialDeployment(aff, controller, identifier));
-        }
-
-        private IEnumerator AerialDeployment(Affiliation aff, EncounterAutoCharacterController controller, int identifier)
-        {
-            Vector3 placement = controller.transform.position - Vector3.down * 100f;
-            while (Vector3.Distance(controller.transform.position, placement) > 0)
-            {
-                controller.transform.position += Vector3.down * 2.5f;
-                yield return null;
-            }
+            controller.Initialize(aff);
             
-            controller.Initialize(aff, new EncounterPreferencesPacket(), identifier);
+            controllersInEncounter[aff].Add(controller);
         }
 
         #region Encounter Initialization
@@ -143,29 +92,6 @@ namespace AutoChessRPG
         public bool CharacterIsHighHealth(StatPacket stats)
         {
             return stats.maxHealth * GameParameters.HIGH_HEALTH_LOWER_THRESHOLD < stats.currHealth && stats.currHealth <= stats.maxHealth * GameParameters.HIGH_HEALTH_UPPER_THRESHOLD;
-        }
-
-        public bool AbilityIsMoreOptimalThan(RealAbilityData ability, RealAbilityData selected, EncounterAutoCharacterController target, Character lead = null)
-        {
-            // Optimal abilities are abilities that have the greatest impact
-            
-            // Protecting the Hero
-            if (lead is not null)
-            {
-                
-            }
-
-            // Finishing off an enemy
-
-            // Saving an ally
-
-            return false;
-
-        }
-
-        public void SignalControllerStatus(int category, int self, float value)
-        {
-            state[category, self] = value;
         }
         
         public float GetAveragePowerFromCharacters(List<Character> characters)
@@ -353,11 +279,11 @@ namespace AutoChessRPG
 
     public class EncounterRecordPacket
     {
-        public Dictionary<Affiliation, List<(EncounterAutoCharacterController, float)>> controllersInEncounter;
+        public Dictionary<Affiliation, List<EncounterAutoCharacterController>> controllersInEncounter;
         public Dictionary<float, MoveRecordPacket> moveRecord;
         public Dictionary<float, ReTargetRecordPacket> reTargetRecord;
 
-        public EncounterRecordPacket(Dictionary<Affiliation, List<(EncounterAutoCharacterController, float)>> _controllersInEncounter)
+        public EncounterRecordPacket(Dictionary<Affiliation, List<EncounterAutoCharacterController>> _controllersInEncounter)
         {
             controllersInEncounter = _controllersInEncounter;
 

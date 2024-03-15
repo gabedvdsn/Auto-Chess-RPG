@@ -7,9 +7,10 @@ namespace AutoChessRPG
     public enum Rarity
     {
         Common = 0,
-        Rare = 1,
-        Epic = 2,
+        Uncommon = 1,
+        Rare = 2,
         Legendary = 3,
-        Artifact = 4
+        Artifact = 4,
+        Fragment = 5
     }
 }

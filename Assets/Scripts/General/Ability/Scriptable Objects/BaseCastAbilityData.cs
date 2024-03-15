@@ -15,9 +15,6 @@ namespace AutoChessRPG
         [SerializeField] protected float levelUpAbilityCastTime;
         [SerializeField] protected float levelUpAbilityCooldown;
 
-        [Header("Other")] 
-        [SerializeField] protected bool hideInUI;
-
         // Base Cast Ability Information Getters
         public AbilityTargetMethod GetTargetMethod() => targetMethod;
         
@@ -28,9 +25,6 @@ namespace AutoChessRPG
         // Level Up Information Getters
         public float GetLevelUpAbilityCastTime() => levelUpAbilityCastTime;
         public float GetLevelUpAbilityCooldown() => levelUpAbilityCooldown;
-        
-        // Other
-        public bool GetHideInUI() => hideInUI;
     }
     
     public class RealCastAbilityData : RealAbilityData
@@ -40,12 +34,14 @@ namespace AutoChessRPG
         private float castTime;
         private float cooldown;
         
-        public RealCastAbilityData(BaseCastAbilityData _baseCastData, RealPowerPacket _power, float _castTime, float _cooldown) : base(_baseCastData, _power)
+        public RealCastAbilityData(BaseCastAbilityData _baseCastData, RealPowerPacket _power, float _castTime, float _cooldown, RealItemData _attachedItem = null) : base(_baseCastData, _power, _attachedItem)
         {
             baseData = _baseCastData;
 
             castTime = _castTime;
             cooldown = _cooldown;
+
+            _attachedItem?.SendCooldown(cooldown);
         }
 
         public override bool LevelUp()
@@ -65,7 +61,7 @@ namespace AutoChessRPG
 
         public float GetRealCastTime() => castTime;
 
-        public float GetRealCooldown() => cooldown;
+        public override float GetCooldown() => cooldown;
 
         public BaseCastAbilityData GetBaseCastData() => baseData;
     }

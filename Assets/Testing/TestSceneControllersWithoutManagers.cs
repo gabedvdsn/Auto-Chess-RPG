@@ -42,7 +42,7 @@ public class TestSceneControllersWithoutManagers : MonoBehaviour
                 GameObject go = controllersByAffiliation[affiliation][i];
                 
                 EncounterAutoCharacterController controller = go.GetComponent<EncounterAutoCharacterController>();
-                controller.Initialize(affiliation, new EncounterPreferencesPacket(), i);
+                controller.Initialize(affiliation);
 
                 go.GetComponent<MeshRenderer>().material = materialsByAffiliation[affiliation];
                 

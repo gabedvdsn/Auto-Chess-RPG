@@ -11,8 +11,7 @@ namespace AutoChessRPG
     // AbilityShelf is responsible for managing cooldowns and baseAbility deployment
     public class AbilityShelf : ObservableSubject
     {
-        private Dictionary<int, RealAbilityData> shelf;
-        private Dictionary<RealAbilityData, float> cooldowns;
+        private Dictionary<int, UnspecifiedAbilityMeta> shelf;
         private List<AbilityRecord> records;
 
         private int size;
@@ -29,7 +28,7 @@ namespace AutoChessRPG
 
         }
 
-        public bool MoveAbility(RealAbilityData baseAbility, int slotToMoveTo)
+        public bool MoveAbility(UnspecifiedAbilityMeta baseAbility, int slotToMoveTo)
         {
             if (shelf.Values.Contains(baseAbility)) return false;
 
@@ -41,7 +40,7 @@ namespace AutoChessRPG
 
             if (shelf[newSlot] is not null)
             {
-                RealAbilityData displacedBaseAbility = shelf[newSlot];
+                UnspecifiedAbilityMeta displacedBaseAbility = shelf[newSlot];
                 shelf[newSlot] = baseAbility;
                 shelf[currSlot] = displacedBaseAbility;
             }
@@ -52,11 +51,9 @@ namespace AutoChessRPG
             }
 
             return true;
-            
-            
         }
 
-        public bool AddAbility(RealAbilityData baseAbility, int abilitySlot)
+        public bool AddAbility(UnspecifiedAbilityMeta baseAbility, int abilitySlot)
         {
             if (shelf.Count + 1 > size) return false;
             if (shelf.Values.Contains(baseAbility)) return false;
@@ -72,51 +69,48 @@ namespace AutoChessRPG
             }
 
             shelf[slot] = baseAbility;
-            cooldowns[baseAbility] = 0f;
 
             return true;
         }
 
-        public bool RemoveAbility(RealAbilityData baseAbility)
+        public bool RemoveAbility(UnspecifiedAbilityMeta baseAbility)
         {
             if (!shelf.Values.Contains(baseAbility)) return false;
 
             int i = shelf.Keys.TakeWhile(abilitySlot => shelf[abilitySlot] != baseAbility).Count();
 
             shelf[i] = null;
-            cooldowns.Remove(baseAbility);
 
             return true;
         }
 
-        public bool RemoveAbility(int abilitySlot)
+        public bool RemoveAbility(int index)
         {
-            if (shelf[abilitySlot] is null) return false;
+            if (!(0 <= index && index < shelf.Count)) return false;
+            
+            if (shelf[index] is null) return false;
 
-            RealAbilityData baseAbility = shelf[abilitySlot];
+            UnspecifiedAbilityMeta baseAbility = shelf[index];
 
-            shelf[abilitySlot] = null;
-            cooldowns.Remove(baseAbility);
+            shelf[index] = null;
 
             return true;
         }
 
-        public bool Initialize(int shelfSize, RealAbilityData[] abilities)
+        public bool Initialize(int shelfSize, UnspecifiedAbilityMeta[] abilities)
         {
-            if (cooldowns is not null) return false;
+            if (shelf is not null) return false;
 
+            shelf = new Dictionary<int, UnspecifiedAbilityMeta>();
             size = shelfSize;
             
             FillShelfWithNull();
-
-            cooldowns = new Dictionary<RealAbilityData, float>();
-
+            
             for (int i = 0; i < size; i++)
             {
                 if (i >= size) return false;
 
                 shelf[i] = abilities[i];
-                cooldowns[abilities[i]] = 0f;
             }
             
             return true;
@@ -127,14 +121,33 @@ namespace AutoChessRPG
             for (int i = 0; i < size; i++) shelf[i] = null;
         }
         
-        public bool OnUseAbility(RealAbilityData baseAbility)
+        public bool OnUseAbility(UnspecifiedAbilityMeta baseAbility)
         {
             return true;
         }
 
-        public bool AbilityIsOffCooldown(RealAbilityData baseAbility) => cooldowns[baseAbility] <= 0f;
+        public bool AbilityIsOffCooldown(UnspecifiedAbilityMeta ability) => ability.IsOffCooldown();
 
-        public RealAbilityData[] GetShelf() => shelf.Values.ToArray();
+        public bool AbilityIsOffCooldown(int index)
+        {
+            if (!(0 <= index && index < shelf.Count)) return false;
+            
+            return shelf[index].IsOffCooldown();
+        }
+
+        public UnspecifiedAbilityMeta[] GetShelf() => shelf.Values.ToArray();
+
+        public RealAbilityData[] GetShelfRealAbilityDatas()
+        {
+            List<RealAbilityData> realAbilityDatas = new List<RealAbilityData>();
+            
+            foreach (UnspecifiedAbilityMeta meta in shelf.Values)
+            {
+                realAbilityDatas.Add(meta.GetRealData());
+            }
+
+            return realAbilityDatas.ToArray();
+        }
     }
 
     public struct AbilityRecord : IObservableData

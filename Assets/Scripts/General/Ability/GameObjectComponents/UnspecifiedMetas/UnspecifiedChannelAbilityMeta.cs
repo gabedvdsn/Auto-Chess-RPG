@@ -14,20 +14,10 @@ namespace AutoChessRPG
         [SerializeField] private bool beginCooldownBeforeChannel = true;
 
         protected bool isChanneling;
-        
-        // Start is called before the first frame update
-        void Start()
-        {
 
-        }
+        public override RealAbilityData GetRealData() => data;
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
-        public bool Instantiate(RealChannelAbilityData abilityData)
+        public bool SendRealChannelAbilityData(RealChannelAbilityData abilityData)
         {
             if (data is not null) return false;
 

@@ -6,7 +6,12 @@ namespace AutoChessRPG
     public enum AbilityTargetMethod
     {
         PointTarget,
-        UnitTarget
+        UnitTarget,
+        ItemTarget,
+        AbilityTarget,
+        PointOrUnitTarget,
+        Self,
+        None
     }
 
     public struct AbilityTargetPacket

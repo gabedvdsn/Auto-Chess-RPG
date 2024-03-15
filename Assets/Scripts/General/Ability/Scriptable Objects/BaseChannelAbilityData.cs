@@ -49,7 +49,7 @@ namespace AutoChessRPG
         private float cooldown;
         private float tickRate;
 
-        public RealChannelAbilityData(BaseChannelAbilityData _baseData, RealPowerPacket _power, float _castTime, float _duration, float _cooldown, float _tickRate) : base(_baseData, _power)
+        public RealChannelAbilityData(BaseChannelAbilityData _baseData, RealPowerPacket _power, float _castTime, float _duration, float _cooldown, float _tickRate, RealItemData _attachedItem = null) : base(_baseData, _power, _attachedItem)
         {
             baseData = _baseData;
 
@@ -59,6 +59,8 @@ namespace AutoChessRPG
             duration = _duration;
             cooldown = _cooldown;
             tickRate = _tickRate;
+            
+            _attachedItem?.SendCooldown(cooldown);
         }
 
         public override bool LevelUp()

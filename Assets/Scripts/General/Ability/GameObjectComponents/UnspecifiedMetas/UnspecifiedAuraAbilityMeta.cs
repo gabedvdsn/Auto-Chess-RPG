@@ -7,6 +7,17 @@ namespace AutoChessRPG
     public class UnspecifiedAuraAbilityMeta : UnspecifiedAbilityMeta, IAuraAbilityMeta
     {
         private RealAbilityData data;
+
+        public override RealAbilityData GetRealData() => data;
+
+        public bool SendRealAbilityData(RealAbilityData _data)
+        {
+            if (data is not null) return false;
+
+            data = _data;
+
+            return true;
+        }
         
         public bool OnAttachAura(Character target)
         {

@@ -13,9 +13,16 @@ namespace AutoChessRPG
     {
         protected RealCastAbilityData data;
 
+        public override void Execute()
+        {
+            StartCoroutine(OnCast());
+        }
+
         protected delegate void OnCastSucceedDelegate(AbilityTargetPacket targetPacket);
         protected OnCastSucceedDelegate OnCastSucceedAction;
 
+        public override RealAbilityData GetRealData() => data;
+        
         public bool SendRealCastAbilityData(RealCastAbilityData abilityData)
         {
             if (data is not null) return false;
@@ -34,7 +41,7 @@ namespace AutoChessRPG
             if (!interrupted)
             {
                 OnCastSucceeded(target);
-                StartCoroutine(DoAbilityCooldown(data.GetRealCooldown()));
+                StartCoroutine(DoAbilityCooldown(data.GetCooldown()));
             }
             else
             {

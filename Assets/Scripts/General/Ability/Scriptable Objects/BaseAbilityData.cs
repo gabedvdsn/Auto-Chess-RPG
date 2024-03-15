@@ -14,8 +14,17 @@ namespace AutoChessRPG
         [SerializeField] protected Affiliation canTarget;
         [SerializeField] protected AbilityActivation activation;
         [SerializeField] protected BasePowerPacket powerPacket;
+        
+        [Header("Specific Ability Information")]
         [SerializeField] protected BaseEffectData[] effectsOfAbility;
-        [SerializeField] protected float range;
+        [SerializeField] protected float abilityRange;
+        
+        [Header("Base Level Up Information")]
+        [SerializeField] protected float levelUpAbilityRange;
+        
+        [Header("Other")]
+        [SerializeField] protected bool hideInUI;
+        
 
         // Base Ability Information Getters
         public Affiliation GetTargetableAffiliation() => canTarget;
@@ -26,7 +35,12 @@ namespace AutoChessRPG
         
         public BaseEffectData[] GetEffects() => effectsOfAbility;
 
-        public float GetRange() => range;
+        public float GetRange() => abilityRange;
+
+        public bool GetHideInUI() => hideInUI;
+        
+        // Level Up Information Getters
+        public float GetLevelUpRange() => levelUpAbilityRange;
     }
 
     public class RealAbilityData
@@ -39,6 +53,8 @@ namespace AutoChessRPG
 
         private RealEffectData[] effectsOfAbility;
 
+        private CastUsagePreference usePreference;
+
         public RealAbilityData(BaseAbilityData _baseData, RealPowerPacket _power, RealItemData _attachedItem = null)
         {
             baseData = _baseData;
@@ -46,6 +62,8 @@ namespace AutoChessRPG
 
             attachedItem = _attachedItem;
         }
+        
+        public virtual void Execute() { }
 
         public virtual bool LevelUp() => power.LevelUp();
 
@@ -61,5 +79,9 @@ namespace AutoChessRPG
         public bool IsAttachedToItem() => attachedItem is not null;
 
         public RealItemData GetAttachmentItem() => attachedItem;
+
+        public CastUsagePreference GetUsePreference() => usePreference;
+
+        public virtual float GetCooldown() => -1f;
     }
 }

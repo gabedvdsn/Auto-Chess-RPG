@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using AutoChessRPG.Entity;
+using Unity.PlasticSCM.Editor.UI;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -12,12 +13,11 @@ namespace AutoChessRPG
         // This data includes items under the following categories: resource, spirit, construction, knowledge
         [Header("Base Item Data Information")] 
         [SerializeField] private ItemType itemType;
-        [FormerlySerializedAs("attachedAttributes")] [SerializeField] private BaseAttributePacket attachedBaseAttributes;
+        [SerializeField] private BasePowerPacket power;
+        [SerializeField] private BaseAttributePacket attachedAttributes;
         [SerializeField] private StatPacket attachedStats;
         [SerializeField] private BaseAbilityData[] attachedAbilities;
-        [SerializeField] private BasePowerPacket power;
         
-        [FormerlySerializedAs("onLevelAttributes")]
         [Header("Level Up Information")]
         [SerializeField] private BaseAttributePacket onLevelBaseAttributes;
         [SerializeField] private StatPacket onLevelStats;
@@ -28,7 +28,7 @@ namespace AutoChessRPG
 
         public BasePowerPacket GetPowerPacket() => power;
         
-        public BaseAttributePacket GetAttachedAttributes() => attachedBaseAttributes;
+        public BaseAttributePacket GetAttachedAttributes() => attachedAttributes;
 
         public StatPacket GetAttachedStats() => attachedStats;
 
@@ -47,28 +47,35 @@ namespace AutoChessRPG
 
         private RealAbilityData[] attachedAbilities;
 
-        private RealAttributePacket _attachedBaseAttributes;
+        private RealAttributePacket attachedBaseAttributes;
         private StatPacket attachedStats;
 
-        
+        private float cooldown = -1f;
 
-        public RealItemData(BaseItemData _baseData, RealPowerPacket _power, RealAbilityData[] _attachedAbilities, RealAttributePacket attachedBaseAttributes, StatPacket _attachedStats, RealItemData _attachedItem = null)
+        public RealItemData(BaseItemData _baseData, RealPowerPacket _power, RealAbilityData[] _attachedAbilities, RealAttributePacket _attachedBaseAttributes, StatPacket _attachedStats)
         {
             baseData = _baseData;
             power = _power;
 
             attachedAbilities = _attachedAbilities;
             
-            _attachedBaseAttributes = attachedBaseAttributes;
+            attachedBaseAttributes = _attachedBaseAttributes;
             attachedStats = _attachedStats;
+
+            foreach (RealAbilityData ability in attachedAbilities)
+            {
+                if (ability.GetCooldown() > cooldown) cooldown = ability.GetCooldown();
+            }
         }
+
+        public void SendCooldown(float _cooldown) => cooldown = _cooldown;
 
         public virtual bool LevelUp()
         {
             if (!power.LevelUp()) return false;
 
             // Level up attached attributes
-            _attachedBaseAttributes.MergeOtherAttributePacket(baseData.GetLevelUpAttachedAttributes());
+            attachedBaseAttributes.MergeOtherAttributePacket(baseData.GetLevelUpAttachedAttributes());
             
             // Level up attached stats
             attachedStats.MergeOtherStatPacket(baseData.GetLevelUpAttachedStats());
@@ -83,13 +90,14 @@ namespace AutoChessRPG
 
         public RealAbilityData[] GetAttachedAbilities() => attachedAbilities;
 
-        public RealAttributePacket GetAttachedAttributes() => _attachedBaseAttributes;
+        public RealAttributePacket GetAttachedAttributes() => attachedBaseAttributes;
 
         public StatPacket GetAttachedStats() => attachedStats;
 
         public RealPowerPacket GetPowerPacket() => power;
 
         public BasePowerPacket GetBasePowerPacket() => baseData.GetPowerPacket();
-        
+
+        public float GetCooldown() => cooldown;
     }
 }

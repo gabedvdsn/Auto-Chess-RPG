@@ -6,6 +6,19 @@ namespace AutoChessRPG
     public class UnspecifiedPassiveAbilityMeta : UnspecifiedAbilityMeta, IPassiveAbilityMeta
     {
         private RealAbilityData data;
+
+        public override void Execute() { }
+        
+        public override RealAbilityData GetRealData() => data;
+
+        public bool SendRealAbilityData(RealAbilityData _data)
+        {
+            if (data is not null) return false;
+
+            data = _data;
+
+            return true;
+        }
         
         public bool OnAttachPassive()
         {

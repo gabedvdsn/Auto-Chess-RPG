@@ -10,6 +10,16 @@ namespace AutoChessRPG
         protected bool attemptingToCast;
         protected bool offCooldown;
         protected bool interrupted;
+
+        public virtual void Execute() { }
+        
+        public virtual RealAbilityData GetRealData() => null;
+
+        public bool IsOffCooldown() => offCooldown;
+
+        public bool IsInterrupted() => interrupted;
+
+        public bool IsAttemptingToCast() => attemptingToCast;
         
         protected IEnumerator DoAbilityCastTime(float duration)
         {
