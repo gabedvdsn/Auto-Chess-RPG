@@ -26,6 +26,16 @@ namespace AutoChessRPG
 
             return true;
         }
+
+        public bool LevelsUp(int levels)
+        {
+            for (int i = 0; i < levels; i++)
+            {
+                if (!LevelUp()) return false;
+            }
+
+            return true;
+        }
     }
 
     [Serializable]

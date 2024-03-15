@@ -98,6 +98,14 @@ namespace AutoChessRPG
             nothingToDo = false;
         }
         
+        #region Open
+
+        public bool AttachEffect(ICharacterEntity _character, RealEffectData effect) => character.AttachEffect(_character, effect);
+
+        public bool RemoveEffect(RealEffectData effect) => character.RemoveEffect(effect);
+        
+        #endregion
+        
         #region Statuses
 
         public void SetPrimaryStatus(bool status) => canAct = status;
@@ -203,11 +211,11 @@ namespace AutoChessRPG
             RealAbilityData optimalAbility = null;
             CastUsagePreference leadingPref = CastUsagePreference.NONE;
             
-            foreach (RealAbilityData ability in abilityShelf.GetShelf())
+            foreach (UnspecifiedAbilityMeta ability in abilityShelf.GetShelf())
             {
                 if (!abilityShelf.AbilityIsOffCooldown(ability)) continue;
                 
-                optimalAbility = GetPreferableAbility(ability, optimalAbility, leadingPref);
+                optimalAbility = GetPreferableAbility(ability.GetRealData(), optimalAbility, leadingPref);
                 leadingPref = optimalAbility.GetUsePreference();
             }
 

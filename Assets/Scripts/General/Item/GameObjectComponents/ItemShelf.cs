@@ -10,7 +10,7 @@ namespace AutoChessRPG
         private Dictionary<RealItemData, float> shelf;
         private List<ItemRecord> records;
 
-        public bool PassItemsOnInstantiation(RealItemData[] items)
+        public bool Instantiate(RealItemData[] items)
         {
             if (shelf is not null) return false;
 
@@ -24,8 +24,8 @@ namespace AutoChessRPG
         public bool OnUseItem(RealItemData item)
         {
             if (!ItemIsOffCooldown(item)) return false;
-            
-            shelf[item] = item.
+
+            shelf[item] = item.GetCooldown();
 
             return true;
         }

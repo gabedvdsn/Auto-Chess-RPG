@@ -48,9 +48,18 @@ namespace AutoChessRPG
         public float GetLevelUpEffectDuration() => levelUpEffectDuration;
         public float GetLevelUpEffectAmount() => levelUpEffectAmount;
         public float GetLevelUpEffectTickRate() => levelUpTickRate;
+
+        public RealEffectData ToRealEffect(int level = 0)
+        {
+            RealEffectData real = new RealEffectData(this, tickRate, effectDuration, effectAmount);
+
+            real.OnLevelsUp(level);
+
+            return real;
+        }
     }
 
-    public class RealEffectData
+    public class RealEffectData : RealData
     {
         private BaseEffectData baseData;
 
@@ -64,6 +73,31 @@ namespace AutoChessRPG
             tickRate = _tickRate;
             effectDuration = _effectDuration;
             effectAmount = _effectAmount;
+        }
+
+        public override bool OnLevelUp()
+        {
+            if (!power.LevelUp()) return false;
+            
+            tickRate += baseData.GetLevelUpEffectTickRate();
+            effectDuration += baseData.GetLevelUpEffectDuration();
+            effectAmount += baseData.GetLevelUpEffectAmount();
+
+            return true;
+        }
+
+        public bool OnLevelsUp(int levels)
+        {
+            for (int i = 0; i < levels; i++)
+            {
+                if (!power.LevelUp()) return false;
+                
+                tickRate += baseData.GetLevelUpEffectTickRate();
+                effectDuration += baseData.GetLevelUpEffectDuration();
+                effectAmount += baseData.GetLevelUpEffectAmount();
+            }
+
+            return true;
         }
 
         public BaseEffectData GetBaseData() => baseData;

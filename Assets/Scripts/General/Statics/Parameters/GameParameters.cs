@@ -41,5 +41,13 @@ namespace AutoChessRPG
         public const float MED_HEALTH_LOWER_THRESHOLD = 0.35f;
         public const float LOW_HEALTH_UPPER_THRESHOLD = 0.35f;
         public const float LOW_HEALTH_LOWER_THRESHOLD = 0f;
+        
+        // Power related
+        public const int WHAT_IS_LOW_COOLDOWN_LOWER = -1;
+        public const int WHAT_IS_LOW_COOLDOWN_UPPER = 5;
+        public const int WHAT_IS_MED_COOLDOWN_LOWER = 5;
+        public const int WHAT_IS_MED_COOLDOWN_UPPER = 20;
+        public const int WHAT_IS_HIGH_COOLDOWN_LOWER = 20;
+        public const int WHAT_IS_HIGH_COOLDOWN_UPPER = 99999;
     }
 }

@@ -36,7 +36,6 @@ public class DemoResourceGather : MonoBehaviour
 
     void CalculateOutput()
     {
-        int index = 0;
         output = 0;
         foreach (int level in minionLevelProficiency.Keys)
         {

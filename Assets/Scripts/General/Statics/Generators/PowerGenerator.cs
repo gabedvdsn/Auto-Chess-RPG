@@ -91,20 +91,34 @@ namespace AutoChessRPG
             /*
              * For items, we sum attributes AND consider stats with regard to attachedEffects ONLY, because (in this case) stats are not consequences of attributes
              */
-
-            Dictionary<CharacterModifierTag, float> modifierValues = new Dictionary<CharacterModifierTag, float>();
             
-            foreach (BaseEffectData effect in realAbility.GetBaseData().GetEffects())
-            {
-                if (modifierValues.ContainsKey(effect.GetModifier())) modifierValues[effect.GetModifier()] += effect.GetEffectAmount();
-                else modifierValues[effect.GetModifier()] = effect.GetEffectAmount();
-            }
-
-            int sumPower = StatsGenerator.ComputeUnspecifiedAttributeSumFromModifierValues(modifierValues);
+            int sumPower = CalculateEffectsPower(realAbility.GetAllEffects());
             
             // Apply PowerPacket multipliers
             return Mathf.CeilToInt(sumPower * CalculateAbilityRarityPowerMultiplier((int)realAbility.GetBasePowerPacket().rarity) *
                                    CalculateAbilityLevelPowerMultiplier(realAbility.GetPowerPacket().level));
+        }
+
+        private static int CalculateEffectsPower(RealEffectData[] effects)
+        {
+            Dictionary<CharacterModifierTag, float> modifierValues = new Dictionary<CharacterModifierTag, float>();
+
+            foreach (RealEffectData effect in effects)
+            {
+                if (!modifierValues.ContainsKey(effect.GetBaseData().GetModifier())) modifierValues[effect.GetBaseData().GetModifier()] = 0f;
+                
+                if (effect.GetBaseData().GetApplyOnce())
+                {
+                    modifierValues[effect.GetBaseData().GetModifier()] = effect.GetAmount();
+                }
+                else
+                {
+                    modifierValues[effect.GetBaseData().GetModifier()] = effect.GetAmount() * effect.GetDuration() / effect.GetTickRate();
+                }
+            }
+            
+            return StatsGenerator.ComputeUnspecifiedAttributeSumFromModifierValues(modifierValues);
+            
         }
         
         #endregion

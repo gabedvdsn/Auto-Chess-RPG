@@ -6,6 +6,7 @@ namespace AutoChessRPG
 {
     public enum CharacterModifierTag
     {
+        // Direct stats
         ModifyCurrentHealth,
         ModifyCurrentMana,
         ModifyMovespeed,
@@ -19,7 +20,12 @@ namespace AutoChessRPG
         ModifyMaxHealth,
         ModifyMaxMana,
         ModifyHealthRegen,
-        ModifyManaRegen
+        ModifyManaRegen,
+        ModifyEvasion,
+        
+        // Other
+        DoForcedMovement
+        
     }
 
 }

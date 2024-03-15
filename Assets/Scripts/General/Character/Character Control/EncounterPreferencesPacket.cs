@@ -37,7 +37,7 @@ namespace AutoChessRPG
             {
                 foreach (RealAbilityData ability in item.GetAttachedAbilities())
                 {
-                    ability.SetIsAttachedToItem(item);
+                    ability.SendAttachedItem(item);
                     abilityPrefs[ability] = itemUsagePreferences[item];
                 }
             }

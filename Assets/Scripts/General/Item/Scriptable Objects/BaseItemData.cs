@@ -39,12 +39,10 @@ namespace AutoChessRPG
         public StatPacket GetLevelUpAttachedStats() => onLevelStats;
     }
 
-    public class RealItemData
+    public class RealItemData : RealData
     {
         private BaseItemData baseData;
-
-        private RealPowerPacket power;
-
+        
         private RealAbilityData[] attachedAbilities;
 
         private RealAttributePacket attachedBaseAttributes;
@@ -52,10 +50,9 @@ namespace AutoChessRPG
 
         private float cooldown = -1f;
 
-        public RealItemData(BaseItemData _baseData, RealPowerPacket _power, RealAbilityData[] _attachedAbilities, RealAttributePacket _attachedBaseAttributes, StatPacket _attachedStats)
+        public RealItemData(BaseItemData _baseData,  RealAbilityData[] _attachedAbilities, RealAttributePacket _attachedBaseAttributes, StatPacket _attachedStats)
         {
             baseData = _baseData;
-            power = _power;
 
             attachedAbilities = _attachedAbilities;
             
@@ -65,12 +62,13 @@ namespace AutoChessRPG
             foreach (RealAbilityData ability in attachedAbilities)
             {
                 if (ability.GetCooldown() > cooldown) cooldown = ability.GetCooldown();
+                ability.SendAttachedItem(this);
             }
         }
 
         public void SendCooldown(float _cooldown) => cooldown = _cooldown;
 
-        public virtual bool LevelUp()
+        public override bool OnLevelUp()
         {
             if (!power.LevelUp()) return false;
 
@@ -81,7 +79,7 @@ namespace AutoChessRPG
             attachedStats.MergeOtherStatPacket(baseData.GetLevelUpAttachedStats());
             
             // Level up attached abilities
-            foreach (RealAbilityData ability in attachedAbilities) ability.LevelUp();
+            foreach (RealAbilityData ability in attachedAbilities) ability.OnLevelUp();
 
             return true;
         }
